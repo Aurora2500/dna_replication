@@ -29,4 +29,5 @@ struct Mesh
 using SimpleMesh = Mesh<SimpleVertex>;
 
 SimpleMesh create_backbone_mesh(int segments, int k, float size);
+SimpleMesh create_test_tri();
 }

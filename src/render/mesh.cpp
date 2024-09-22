@@ -45,11 +45,12 @@ void Mesh<V>::draw() const
 }
 
 SimpleMesh create_backbone_mesh(int segments, int k, float size) {
+	//TODO: something's wrong with the mesh generation :/
 	SimpleMesh res;
 
-	res.vertices = std::vector<SimpleVertex>(k * (segments + 1));
+	res.vertices.reserve(k * (segments + 1));
 	for (int i = 0; i <= segments; i++) {
-		float t = static_cast<float>(segments) / i;
+		float t = i / static_cast<float>(segments);
 		for (int j = 0; j < k; j++) {
 			float alpha = 2 * M_PI * j / k;
 			res.vertices.push_back({{-sin(alpha)*size, cos(alpha)*size, t}});
@@ -57,20 +58,42 @@ SimpleMesh create_backbone_mesh(int segments, int k, float size) {
 	}
 
 	res.indices.reserve(6 * k * segments);
-	for (int i = 0; i < segments * 4; i+= 4) {
+	for (int i = 0; i < segments * k; i+= k) {
 		for (int f = 0; f < k; f++) {
-			res.indices.push_back(i +  f);
-			res.indices.push_back(i + (f+1)%k);
-			res.indices.push_back(i +  f      + k);
+			int top_left = i + f;
+			int bottom_left = i + (f+1)%k;
+			int top_right = i + f + k;
+			int bottom_right = i + (f+1)%k + k;
 
-			res.indices.push_back(i + (f+1)%k);
-			res.indices.push_back(i + (f+1)%k + k);
-			res.indices.push_back(i +  f      + k);
+			res.indices.push_back(top_left);
+			res.indices.push_back(bottom_left);
+			res.indices.push_back(top_right);
+
+			res.indices.push_back(bottom_left);
+			res.indices.push_back(top_right);
+			res.indices.push_back(bottom_right);
 		}
 	}
 
 	res.make_buffers();
 	return res;
 }
+
+SimpleMesh create_test_tri() {
+	SimpleMesh res;
+
+	res.vertices.push_back({{-.5, -.5, 0.}});
+	res.vertices.push_back({{.5, -.5, 0.}});
+	res.vertices.push_back({{0., .5, 0.}});
+
+	res.indices.push_back(0);
+	res.indices.push_back(1);
+	res.indices.push_back(2);
+
+	res.make_buffers();
+	return res;
+}
+
+template class Mesh<SimpleVertex>;
 
 }
