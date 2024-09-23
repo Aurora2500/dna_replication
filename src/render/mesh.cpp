@@ -45,7 +45,6 @@ void Mesh<V>::draw() const
 }
 
 SimpleMesh create_backbone_mesh(int segments, int k, float size) {
-	//TODO: something's wrong with the mesh generation :/
 	SimpleMesh res;
 
 	res.vertices.reserve(k * (segments + 1));
@@ -70,8 +69,8 @@ SimpleMesh create_backbone_mesh(int segments, int k, float size) {
 			res.indices.push_back(top_right);
 
 			res.indices.push_back(bottom_left);
-			res.indices.push_back(top_right);
 			res.indices.push_back(bottom_right);
+			res.indices.push_back(top_right);
 		}
 	}
 
