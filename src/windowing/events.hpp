@@ -10,6 +10,7 @@ enum class EventKind: u_int32_t
 	Keyboard = 1 << 0,
 	MouseButton = 1 << 1,
 	MouseMotion = 1 << 2,
+	MouseWheel = 1 << 3,
 	Quit = 1 << 5,
 };
 
@@ -42,6 +43,10 @@ struct MotionEvent {
 	Position rel;
 };
 
+struct MouseWheel {
+	float scroll;
+};
+
 struct KeyboardEvent
 {
 	SDL_KeyCode key;
@@ -56,6 +61,7 @@ struct Event
 		MouseEvent mouse;
 		MotionEvent motion;
 		KeyboardEvent keyboard;
+		MouseWheel wheel;
 	};
 };
 

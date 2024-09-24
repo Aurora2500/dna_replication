@@ -45,6 +45,14 @@ void Mesh<V>::draw() const
 	glBindVertexArray(0);
 }
 
+template <typename V>
+void Mesh<V>::draw_instanced(int count) const
+{
+	glBindVertexArray(VAO);
+	glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr, count);
+	glBindVertexArray(0);
+}
+
 SimpleMesh create_backbone_mesh(int segments, int k, float size) {
 	SimpleMesh res;
 

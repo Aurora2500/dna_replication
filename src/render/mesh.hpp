@@ -24,6 +24,7 @@ struct Mesh
 	void make_buffers();
 
 	void draw() const;
+	void draw_instanced(int count) const;
 };
 
 using SimpleMesh = Mesh<SimpleVertex>;

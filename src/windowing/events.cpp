@@ -34,6 +34,10 @@ static bool to_event(SDL_Event event, Event &out)
 		out.motion.rel.x = event.motion.xrel;
 		out.motion.rel.y = event.motion.yrel;
 		break;
+	case SDL_MOUSEWHEEL:
+		out.kind = EventKind::MouseWheel;
+		out.wheel.scroll = event.wheel.preciseY;
+		break;
 	case SDL_QUIT:
 		out.kind = EventKind::Quit;
 		break;
