@@ -35,6 +35,7 @@ struct Position {
 struct MouseEvent {
 	MouseButton button;
 	Position pos;
+	bool pressed;
 };
 
 struct MotionEvent {

@@ -6,7 +6,7 @@
 class Camera
 {
 private:
-	glm::vec3 m_pos;
+	glm::vec3 m_focus;
 	float m_yaw;
 	float m_pitch;
 	float m_distance;
@@ -32,6 +32,6 @@ public:
 	inline const float &fov() const { return m_fov; }
 	inline float &aspect() { return m_aspect; }
 	inline const float &aspect() const { return m_aspect; }
-	inline glm::vec3 &focus() { return m_pos; }
-	inline const glm::vec3 &focus() const { return m_pos; }
+	inline glm::vec3 &focus() { return m_focus; }
+	inline const glm::vec3 &focus() const { return m_focus; }
 };

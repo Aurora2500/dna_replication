@@ -20,12 +20,14 @@ static bool to_event(SDL_Event event, Event &out)
 		out.mouse.button = static_cast<MouseButton>(event.button.button);
 		out.mouse.pos.x = event.button.x;
 		out.mouse.pos.y = event.button.y;
+		out.mouse.pressed = true;
 		break;
 	case SDL_MOUSEBUTTONUP:
 		out.kind = EventKind::MouseButton;
 		out.mouse.button = static_cast<MouseButton>(event.button.button);
 		out.mouse.pos.x = event.button.x;
 		out.mouse.pos.y = event.button.y;
+		out.mouse.pressed = false;
 		break;
 	case SDL_MOUSEMOTION:
 		out.kind = EventKind::MouseMotion;
