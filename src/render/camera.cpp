@@ -13,7 +13,7 @@ Camera::Camera(float aspect)
 	, m_distance(10.0f)
 	, m_fov(25.0f)
 	, m_near(0.1f)
-	, m_far(300.0f)
+	, m_far(3000.0f)
 	, m_aspect(aspect)
 {
 }

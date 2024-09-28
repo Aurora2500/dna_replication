@@ -8,6 +8,7 @@ layout(std430, binding = 0) buffer ControlPoints {
 layout (location = 0) in vec3 bnp;
 
 out vec3 surface_normal;
+out float p;
 
 uniform mat4 vp;
 
@@ -43,17 +44,19 @@ void main()
 
 	vec3 point = bspline(bnp.z, p1, p2, p3, p4);
 	vec3 tangent = bspline_tangent(bnp.z, p1, p2, p3, p4);
-	vec3 binormal = cross(up, tangent);
-	vec3 normal = cross(tangent, binormal);
+	vec3 binormal = normalize(cross(up, tangent));
+	vec3 normal = normalize(cross(tangent, binormal));
 
 	gl_Position = vp * vec4(point + bnp.x * binormal + bnp.y * normal, 1.0);
 	surface_normal = normalize(bnp.x * binormal + bnp.y * normal);
+	p = bnp.z;
 }
 
 //shader fragment
 #version 330 core
 
 in vec3 surface_normal;
+in float p;
 
 layout (location = 0) out vec4 color;
 
@@ -64,5 +67,6 @@ void main()
 	float light = dot(normalize(surface_normal), normalize(light));
 	light = clamp(light, 0.0, 1.0);
 	vec3 c = mix(vec3(0.3), vec3(0.8), light);
+	// c.r = p;
 	color = vec4(c, 1.0);
 }
