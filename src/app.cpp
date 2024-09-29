@@ -1,5 +1,7 @@
 #include "assets/assets_manager.hpp"
 
+#include "debug/line.hpp"
+
 #include "render/mesh.hpp"
 #include "render/ssbo.hpp"
 
@@ -13,33 +15,15 @@
 
 #include <iostream>
 
-std::vector<glm::vec3> control_points() {
+std::vector<glm::vec4> control_points() {
 
 	int n = 20;
 
-	std::vector<glm::vec3> res;
-	// res = {
-	// 	{-n/2, 0.0, 0.0},
-	// 	{-n/2, 0.0, 0.0},
-	// 	{-n/2, 0.0, 0.0},
-	// 	{-n/2, 0.0, 0.0},
-	// };
-
-	// for (int i = 0; i < n; i++) {
-	// 	res.push_back({i-n/2, 0, 0});
-	// }
-	// res.push_back({n/2, 0.0, 0.0});
-	// res.push_back({n/2, 0.0, 0.0});
-	// res.push_back({n/2, 0.0, 0.0});
-	// res.push_back({n/2, 0.0, 0.0});
-
-	res.push_back({0, 0, 0});
-	res.push_back({0, 0, 0});
-	res.push_back({0, 0, 0});
-	res.push_back({0, 0, 0});
+	std::vector<glm::vec4> res;
 
 	for (int i = 0; i < n; i++) {
-		res.push_back({i, i, i});
+		res.push_back({i, sin(i), cos(i), 0});
+		// res.push_back({i, i, i, 0});
 	}
 
 	return res;
@@ -53,15 +37,23 @@ void run_app() {
 
 	CameraController cam(window.aspect());
 
-	auto& backbone_shader = asset_manager.get_shader("backbone");
-	auto backbone = rendering::create_backbone_mesh(10, 3, 0.02);
-
 	auto cp = control_points();
+
+	auto& backbone_shader = asset_manager.get_shader("backbone");
+	auto backbone = rendering::create_backbone_mesh(32, 16, 0.2);
+	
+	auto &line_shader = asset_manager.get_shader("line");
+	std::vector<glm::vec4> debug;
+	int debug_pres = 100;
+	for (int i = 0; i <= debug_pres; i++) {
+		debug.push_back({0., 0., float(i)/debug_pres, 0});
+	}
+	debug::line d_line(debug);
+
 	rendering::SSBO ssbo;
-	ssbo.set_data(cp.data(), cp.size() * sizeof(glm::vec3));
+	ssbo.set_data(cp.data(), cp.size() * sizeof(glm::vec4));
 	ssbo.bind_shader(0);
 
-	backbone_shader.use();
 
 	// for (auto e : cp) {
 	// 	std::cout << e.x << " " << e.y << " " << e.z << std::endl;
@@ -71,9 +63,15 @@ void run_app() {
 		window.clear();
 		cam.handle_events(event_manager);
 		auto view_proj = cam.cam.get_view_matrix();
-		backbone_shader.set_uniform("vp", view_proj);
 
-		backbone.draw_instanced(12);
+		backbone_shader.use();
+		backbone_shader.set_uniform("vp", view_proj);
+		backbone.draw_instanced(cp.size() - 3);
+		
+		line_shader.use();
+		line_shader.set_uniform("vp", view_proj);
+		line_shader.set_uniform("line_col", glm::vec3(1., 0., 0.));
+		d_line.draw(cp.size() - 1);
 
 		window.handle_events(event_manager);
 		window.update();

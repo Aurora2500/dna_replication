@@ -11,10 +11,11 @@ project "dnarepl"
 	includedirs { "src" }
 	links { "SDL2", "GL", "GLEW"}
 
-	-- filter "configurations:Debug"
-		-- defines { "DEBUG" }
-		-- symbols "On"
+	filter "configurations:Debug"
+		defines { "DEBUG" }
+		debugger "GDB"
+		symbols "On"
 
-	-- filter "configurations:Release"
-		-- defines { "NDEBUG" }
-		-- optimize "On"
+	filter "configurations:Release"
+		defines { "NDEBUG" }
+		optimize "On"

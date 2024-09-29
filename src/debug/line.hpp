@@ -11,12 +11,15 @@ namespace debug {
 class line
 {
 private:
-	std::vector<glm::vec3> m_points;
-	unsigned int m_id;
+	unsigned int m_vao;
+	unsigned int m_vbo;
+	unsigned int num_points;
 
 public:
-	line(std::vector<glm::vec3> points);
+	line(const std::vector<glm::vec4>& points);
 
+	void draw();
+	void draw(int count);
 };
 
 }

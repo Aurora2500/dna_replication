@@ -19,7 +19,7 @@ void CameraController::handle_events(EventManager& events) {
 			cam.pitch() = std::clamp(static_cast<double>(e.motion.rel.y * sensitivity + cam.pitch()), -M_PI_2, M_PI_2);
 		}
 		if (e.kind == EventKind::MouseWheel) {
-			cam.distance() += e.wheel.scroll;
+			cam.distance() -= e.wheel.scroll;
 		}
 	}
 }
