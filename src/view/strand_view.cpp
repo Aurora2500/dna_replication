@@ -30,7 +30,7 @@ strand_view::strand_view(Strand&& strand, const std::vector<glm::vec4>& control_
 	: m_strand(strand)
 	, m_control_points(control_points)
 	, m_backbone_mesh(create_backbone_mesh(50, 16, 0.1))
-	, m_nucleobase_mesh(create_nucleobase_mesh(glm::vec3(0.02, 0.35, 0.1)))
+	, m_nucleobase_mesh(create_nucleobase_mesh(glm::vec3(0.08, 0.35, 0.1)))
 {
 	upload_nucleobases();
 	m_control_point_ssbo.set_data(m_control_points.data(), m_control_points.size() * sizeof(glm::vec4));

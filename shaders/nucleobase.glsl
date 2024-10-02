@@ -27,9 +27,9 @@ const mat4 bspline_basis = mat4(
 	1./6., 0./6., 0./6., 0./6.
 );
 
-vec3 bspline(float t, vec3 p1, vec3 p2, vec3 p3, vec3 p4) {
+vec4 bspline(float t, vec4 p1, vec4 p2, vec4 p3, vec4 p4) {
 	vec4 T = vec4(t*t*t, t*t, t, 1.0);
-	mat3x4 P = transpose(mat4x3(p1, p2, p3, p4));
+	mat4 P = transpose(mat4(p1, p2, p3, p4));
 	return (T * bspline_basis * P);
 }
 
@@ -53,9 +53,12 @@ void main()
 	vec4 p3 = points[param_idx + 2];
 	vec4 p4 = points[param_idx + 3];
 
-	vec3 point = bspline(param_t, p1.xyz, p2.xyz, p3.xyz, p4.xyz);
+	vec4 point = bspline(param_t, p1, p2, p3, p4);
+	float param_rot = point.w;
 	vec3 tangent = bspline_tangent(param_t, p1.xyz, p2.xyz, p3.xyz, p4.xyz);
-	vec3 binormal = normalize(cross(up, tangent));
+	vec3 unrot_binormal = normalize(cross(up, tangent));
+	vec3 binormal = cos(param_rot) * unrot_binormal
+		- sin(param_rot) * normalize(cross(tangent, unrot_binormal));
 	vec3 b_normal = normalize(cross(tangent, binormal));
 
 	mat3 transform = mat3(
@@ -64,7 +67,7 @@ void main()
 		tangent
 	);
 
-	gl_Position = vp * vec4(transform * pos + point, 1.0);
+	gl_Position = vp * vec4(transform * pos + point.xyz, 1.0);
 	surface_normal = transform * normal;
 	uint chunk_idx = gl_InstanceID / 16;
 	uint chunk_component = gl_InstanceID % 16;
