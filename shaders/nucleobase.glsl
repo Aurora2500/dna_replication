@@ -66,7 +66,6 @@ void main()
 
 	gl_Position = vp * vec4(transform * pos + point, 1.0);
 	surface_normal = transform * normal;
-
 	uint chunk_idx = gl_InstanceID / 16;
 	uint chunk_component = gl_InstanceID % 16;
 
@@ -79,12 +78,17 @@ void main()
 //shader fragment
 #version 430 core
 
-uniform mat4 colors;
+const mat4 colors = mat4(
+	0.9, 0.5, 0.5, 1., // adenine
+	0.7, 0.7, 0.3, 1., // thymine
+	0.3, 0.6, 0.4, 1., // guanine
+	0.3, 0.4, 0.7, 1.  // cytosine
+);
 
 flat in uint nucleobase;
 in vec3 surface_normal;
 
-layout (location = 0) out vec4 col;
+layout (location = 0) out vec4 frag_col;
 
 const vec3 light = vec3(0.3, 0.3, -0.7);
 
@@ -96,5 +100,5 @@ void main()
 	light = clamp(light, 0., 1.);
 	float final_light = mix(0.3, 1.0, light);
 
-	col = vec4(final_light * base_color, 1.);
+	frag_col = vec4(final_light * base_color, 1.);
 }

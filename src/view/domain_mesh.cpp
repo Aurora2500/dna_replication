@@ -90,5 +90,6 @@ rendering::PosNormMesh create_nucleobase_mesh(glm::vec3 size) {
 		res.indices.push_back(top_left);
 	}
 
+	res.make_buffers();
 	return res;
 }

@@ -24,7 +24,7 @@ std::vector<glm::vec4> control_points() {
 
 	std::vector<glm::vec4> res;
 
-	for (int i = 0; i < n; i++) {
+	for (int i = -n; i < n; i++) {
 		res.push_back({i, sin(i), cos(i), 0});
 	}
 
@@ -34,7 +34,7 @@ std::vector<glm::vec4> control_points() {
 Strand make_test_strand() {
 	std::vector<Nucleobase> s;
 
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 30; i++) {
 		s.push_back(Nucleobase::Adenine);
 		s.push_back(Nucleobase::Thymine);
 		s.push_back(Nucleobase::Guanine);
