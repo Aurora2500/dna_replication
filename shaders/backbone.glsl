@@ -2,7 +2,7 @@
 #version 430 core
 
 layout(std430, binding = 0) buffer ControlPoints {
-	vec3 points[];
+	vec4 points[];
 };
 
 layout (location = 0) in vec3 bnp;
@@ -37,10 +37,10 @@ const vec3 up = vec3(0.0, 1.0, 0.0);
 
 void main()
 {
-	vec3 p1 = points[gl_InstanceID + 0];
-	vec3 p2 = points[gl_InstanceID + 1];
-	vec3 p3 = points[gl_InstanceID + 2];
-	vec3 p4 = points[gl_InstanceID + 3];
+	vec3 p1 = points[gl_InstanceID + 0].xyz;
+	vec3 p2 = points[gl_InstanceID + 1].xyz;
+	vec3 p3 = points[gl_InstanceID + 2].xyz;
+	vec3 p4 = points[gl_InstanceID + 3].xyz;
 
 	vec3 point = bspline(bnp.z, p1, p2, p3, p4);
 	vec3 tangent = bspline_tangent(bnp.z, p1, p2, p3, p4);

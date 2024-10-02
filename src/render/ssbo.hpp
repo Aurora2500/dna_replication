@@ -11,6 +11,7 @@ private:
 
 public:
 	SSBO();
+	~SSBO();
 
 	void bind();
 	void unbind();

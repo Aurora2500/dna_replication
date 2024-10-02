@@ -14,6 +14,14 @@ struct SimpleVertex
 	static void attrib(unsigned int vao, unsigned int vbo);
 };
 
+struct PosNormVertex
+{
+	glm::vec3 position;
+	glm::vec3 normal;
+
+	static void attrib(unsigned int vao, unsigned int vbo);
+};
+
 template <typename V>
 struct Mesh
 {
@@ -28,7 +36,7 @@ struct Mesh
 };
 
 using SimpleMesh = Mesh<SimpleVertex>;
+using PosNormMesh = Mesh<PosNormVertex>;
 
-SimpleMesh create_backbone_mesh(int segments, int k, float size);
 SimpleMesh create_test_tri();
 }

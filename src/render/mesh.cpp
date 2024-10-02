@@ -14,6 +14,16 @@ void SimpleVertex::attrib(unsigned int vao, unsigned int vbo) {
 	glVertexArrayVertexBuffer(vao, 0, vbo, 0, sizeof(SimpleVertex));
 }
 
+void PosNormVertex::attrib(unsigned int vao, unsigned int vbo) {
+	glEnableVertexArrayAttrib(vao, 0);
+	glEnableVertexArrayAttrib(vao, 1);
+	glVertexArrayAttribBinding(vao, 0, 0);
+	glVertexArrayAttribBinding(vao, 1, 0);
+	glVertexArrayAttribFormat(vao, 0, 3, GL_FLOAT, GL_FALSE, offsetof(PosNormVertex, position));
+	glVertexArrayAttribFormat(vao, 1, 3, GL_FLOAT, GL_FALSE, offsetof(PosNormVertex, normal));
+	glVertexArrayVertexBuffer(vao, 0, vbo, 0, sizeof(PosNormVertex));
+}
+
 template <typename V>
 void Mesh<V>::make_buffers()
 {
@@ -53,40 +63,6 @@ void Mesh<V>::draw_instanced(int count) const
 	glBindVertexArray(0);
 }
 
-SimpleMesh create_backbone_mesh(int segments, int k, float size) {
-	SimpleMesh res;
-
-	res.vertices.reserve(k * (segments + 1));
-	for (int i = 0; i <= segments; i++) {
-		float t = i / static_cast<float>(segments);
-		for (int j = 0; j < k; j++) {
-			float alpha = 2 * M_PI * j / k;
-			res.vertices.push_back({{-sin(alpha)*size, cos(alpha)*size, t}});
-		}
-	}
-
-	res.indices.reserve(6 * k * segments);
-	for (int i = 0; i < segments * k; i+= k) {
-		for (int f = 0; f < k; f++) {
-			int top_left = i + f;
-			int bottom_left = i + (f+1)%k;
-			int top_right = i + f + k;
-			int bottom_right = i + (f+1)%k + k;
-
-			res.indices.push_back(top_left);
-			res.indices.push_back(bottom_left);
-			res.indices.push_back(top_right);
-
-			res.indices.push_back(bottom_left);
-			res.indices.push_back(bottom_right);
-			res.indices.push_back(top_right);
-		}
-	}
-
-	res.make_buffers();
-	return res;
-}
-
 SimpleMesh create_test_tri() {
 	SimpleMesh res;
 
@@ -103,5 +79,6 @@ SimpleMesh create_test_tri() {
 }
 
 template class Mesh<SimpleVertex>;
+template class Mesh<PosNormVertex>;
 
 }

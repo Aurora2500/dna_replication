@@ -1,6 +1,6 @@
 #pragma once
 
-enum class NucleobaseType {
+enum class NucleobaseType: char {
 	Adenine = 0,
 	Thymine = 1,
 	Guanine = 2,
@@ -19,6 +19,7 @@ public:
 	Nucleobase complement() const;
 
 	bool operator==(const Nucleobase& rhs) const;
+	explicit operator char() const;
 
 	static const Nucleobase Adenine;
 	static const Nucleobase Thymine;

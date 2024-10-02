@@ -22,11 +22,15 @@ Nucleobase::Nucleobase(char letter)
 { }
 
 Nucleobase Nucleobase::complement() const {
-	return Nucleobase(static_cast<NucleobaseType>(static_cast<int>(m_type) ^ 1));
+	return Nucleobase(static_cast<NucleobaseType>(static_cast<char>(m_type) ^ 1));
 }
 
 bool Nucleobase::operator==(const Nucleobase& rhs) const {
 	return m_type == rhs.m_type;
+}
+
+Nucleobase::operator char() const {
+	return static_cast<char>(m_type);
 }
 
 const Nucleobase Nucleobase::Adenine(NucleobaseType::Adenine);
