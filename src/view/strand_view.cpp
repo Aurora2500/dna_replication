@@ -30,7 +30,7 @@ strand_view::strand_view(Strand&& strand, const std::vector<glm::vec4>& control_
 	: m_strand(strand)
 	, m_control_points(control_points)
 	, m_backbone_mesh(create_backbone_mesh(50, 16, 0.1))
-	, m_nucleobase_mesh(create_nucleobase_mesh(glm::vec3(0.08, 0.35, 0.1)))
+	, m_nucleobase_mesh(create_nucleobase_mesh(glm::vec3(0.08, 0.45, 0.1)))
 {
 	upload_nucleobases();
 	m_control_point_ssbo.set_data(m_control_points.data(), m_control_points.size() * sizeof(glm::vec4));
@@ -41,18 +41,27 @@ void strand_view::draw(Camera& cam, assets::AssetsManager& assets) {
 
 	// render backbone
 	auto& backbone_shader = assets.get_shader("backbone");
+	m_control_point_ssbo.bind_shader(0);
+
 	backbone_shader.use();
 	backbone_shader.set_uniform("vp", vp);
-	m_control_point_ssbo.bind_shader(0);
-	
+	backbone_shader.set_uniform("offset_pos", glm::vec2(0., -0.5));
+
+	backbone_shader.set_uniform("complement", 0);
+	m_backbone_mesh.draw_instanced(m_control_points.size()-3);
+	backbone_shader.set_uniform("complement", 1);
 	m_backbone_mesh.draw_instanced(m_control_points.size()-3);
 
 	//render nucleobases
+	m_nucleobase_ssbo.bind_shader(1);
 	auto& nucleobase_shader = assets.get_shader("nucleobase");
 	nucleobase_shader.use();
 	nucleobase_shader.set_uniform("vp", vp);
 	nucleobase_shader.set_uniform("param_offset", glm::vec2(0.125, 0.25));
-	m_control_point_ssbo.bind_shader(0);
-	m_nucleobase_ssbo.bind_shader(1);
+	nucleobase_shader.set_uniform("offset_pos", glm::vec2(0., -0.5));
+
+	nucleobase_shader.set_uniform("complement", 0);
+	m_nucleobase_mesh.draw_instanced(m_strand.nucleobases().size());
+	nucleobase_shader.set_uniform("complement", 1);
 	m_nucleobase_mesh.draw_instanced(m_strand.nucleobases().size());
 }

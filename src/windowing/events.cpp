@@ -38,6 +38,17 @@ static bool to_event(SDL_Event event, Event &out)
 		out.kind = EventKind::MouseWheel;
 		out.wheel.scroll = event.wheel.preciseY;
 		break;
+	case SDL_WINDOWEVENT:
+		switch (event.window.event) {
+		case SDL_WINDOWEVENT_RESIZED:
+			out.kind = EventKind::WindowResize;
+			out.resize.new_w = event.window.data1;
+			out.resize.new_h = event.window.data2;
+			break;
+		default:
+			return false;
+		}
+		break;
 	case SDL_QUIT:
 		out.kind = EventKind::Quit;
 		break;

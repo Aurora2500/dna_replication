@@ -6,6 +6,8 @@
 
 #include <SDL2/SDL.h>
 
+#include "render/obj_reader.hpp"
+
 namespace assets {
 
 AssetsManager::AssetsManager() {
@@ -14,7 +16,7 @@ AssetsManager::AssetsManager() {
 	SDL_free(base);
 }
 
-rendering::Shader& AssetsManager::get_shader(const std::string &name) {
+rendering::Shader& AssetsManager::get_shader(const std::string& name) {
 	auto it = m_shaders.find(name);
 
 	if (it != m_shaders.end()) {
@@ -29,6 +31,16 @@ rendering::Shader& AssetsManager::get_shader(const std::string &name) {
 	return *r.first->second;
 }
 
+rendering::PosNormMesh& AssetsManager::get_model(const std::string& name) {
+	auto it = m_meshes.find(name);
+	if (it != m_meshes.end()) {
+		return *it->second;
+	}
+
+	std::string path = m_base_path + "models/" + name + ".obj";
+	std::ifstream file(path);
+	std::string src = (std::stringstream() << file.rdbuf()).str();
+}
 
 
 }

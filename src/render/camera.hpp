@@ -3,6 +3,17 @@
 #include <glm/glm.hpp>
 #include <SDL2/SDL.h>
 
+#include "math/plane.hpp"
+
+struct frustum_planes {
+	plane near;
+	plane far;
+	plane top;
+	plane left;
+	plane bottom;
+	plane right;
+};
+
 class Camera
 {
 private:
@@ -16,12 +27,10 @@ private:
 
 public:
 	Camera(float aspect);
-	~Camera();
 
 	glm::vec3 pos() const;
 
 	glm::mat4 get_view_matrix() const;
-	glm::mat4 get_untranslated_view_matrix() const;
 
 	inline float &yaw() { return m_yaw; }
 	inline const float &yaw() const { return m_yaw; }
@@ -34,4 +43,9 @@ public:
 	inline const float &aspect() const { return m_aspect; }
 	inline glm::vec3 &focus() { return m_focus; }
 	inline const glm::vec3 &focus() const { return m_focus; }
+
+	inline float near() const { return m_near; }
+	inline float far() const { return m_far; }
+
+	frustum_planes frustum() const;
 };

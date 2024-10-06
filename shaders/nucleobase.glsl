@@ -12,11 +12,17 @@ layout (std430, binding = 1) buffer Nucleobases {
 uniform vec2 param_offset;
 uniform mat4 vp;
 
+uniform vec2 offset_pos;
+
+uniform bool complement;
+
 layout (location = 0) in vec3 pos;
 layout (location = 1) in vec3 normal;
 
 out vec3 surface_normal;
 flat out uint nucleobase;
+
+const float PI = 3.1415926535897932384626;
 
 // b spline basis matrix, GLSL stores data in column major order
 // so it's the transpose of what one'd find on the internet
@@ -54,7 +60,7 @@ void main()
 	vec4 p4 = points[param_idx + 3];
 
 	vec4 point = bspline(param_t, p1, p2, p3, p4);
-	float param_rot = point.w;
+	float param_rot = point.w + (complement ? PI : 0);
 	vec3 tangent = bspline_tangent(param_t, p1.xyz, p2.xyz, p3.xyz, p4.xyz);
 	vec3 unrot_binormal = normalize(cross(up, tangent));
 	vec3 binormal = cos(param_rot) * unrot_binormal
@@ -67,7 +73,7 @@ void main()
 		tangent
 	);
 
-	gl_Position = vp * vec4(transform * pos + point.xyz, 1.0);
+	gl_Position = vp * vec4(transform * (pos + vec3(offset_pos, 0.)) + point.xyz, 1.0);
 	surface_normal = transform * normal;
 	uint chunk_idx = gl_InstanceID / 16;
 	uint chunk_component = gl_InstanceID % 16;
@@ -75,6 +81,9 @@ void main()
 	uint chunk = nucleobases[chunk_idx];
 	chunk >>= chunk_component * 2;
 	chunk &= uint(3);
+	if (complement) {
+		chunk ^= 1;
+	}
 	nucleobase = chunk;
 }
 

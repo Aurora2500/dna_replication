@@ -25,7 +25,7 @@ std::vector<glm::vec4> control_points() {
 	std::vector<glm::vec4> res;
 
 	for (int i = -n; i < n; i++) {
-		res.push_back({i, sin(i), cos(i), i + M_PI_2});
+		res.push_back({i, 0, 0, 2*i + M_PI_2});
 	}
 
 	return res;

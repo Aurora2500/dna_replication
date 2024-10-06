@@ -79,15 +79,12 @@ void Window::handle_events(EventManager &event)
 	if (event.test_flag(EventKind::Quit)) {
 		m_running = false;
 	}
-	// case SDL_WINDOWEVENT:
-	// 	switch (event.window.event)
-	// 	{
-	// 	case SDL_WINDOWEVENT_RESIZED:
-	// 		m_width = event.window.data1;
-	// 		m_height = event.window.data2;
-	// 		break;
-	// 	}
-	// 	break;
+	for (auto& e: event.events()) {
+		if (e.kind == EventKind::WindowResize) {
+			m_width = e.resize.new_w;
+			m_height = e.resize.new_h;
+		}
+	}
 	for (auto& e: event.events()) {
 		if (e.kind == EventKind::Keyboard && e.keyboard.down) {
 			switch (e.keyboard.key) {
@@ -95,6 +92,7 @@ void Window::handle_events(EventManager &event)
 					m_is_fullscreen = !m_is_fullscreen;
 					SDL_SetWindowFullscreen(m_window, m_is_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
 					break;
+				case SDLK_q:
 				case SDLK_ESCAPE:
 					m_running = false;
 					break;

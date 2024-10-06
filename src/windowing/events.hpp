@@ -11,6 +11,7 @@ enum class EventKind: u_int32_t
 	MouseButton = 1 << 1,
 	MouseMotion = 1 << 2,
 	MouseWheel = 1 << 3,
+	WindowResize = 1 << 4,
 	Quit = 1 << 5,
 };
 
@@ -53,6 +54,11 @@ struct KeyboardEvent
 	bool down;
 };
 
+struct WindowResizeEvent {
+	int new_w;
+	int new_h;
+};
+
 struct Event
 {
 	EventKind kind;
@@ -62,6 +68,7 @@ struct Event
 		MotionEvent motion;
 		KeyboardEvent keyboard;
 		MouseWheel wheel;
+		WindowResizeEvent resize;
 	};
 };
 
