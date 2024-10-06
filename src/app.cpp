@@ -56,12 +56,17 @@ void run_app() {
 
 	strand_view sv(std::move(s), cp);
 	auto& helicase_mesh = asset_manager.get_model("helicase");
-	auto& helicase_shader = asset_manager.get_shader("object_free");
+	auto& ligase_mesh = asset_manager.get_model("ligase");
+	auto& polymerase_mesh = asset_manager.get_model("polymerase");
+
+	auto& obj_shader = asset_manager.get_shader("object_free");
 
 	glm::mat4 helicase_model(1.);
 	glm::mat3 helicase_normal(1.);
 
 	helicase_model = glm::translate(helicase_model, glm::vec3(0.0, 3., 0.f));
+	glm::mat4 ligase_model = glm::translate(helicase_model, glm::vec3(-2., 0., 0.));
+	glm::mat4 polymerase_model = glm::translate(helicase_model, glm::vec3(2., 0., 0.));
 
 	while (window.running()) {
 		event_manager.poll();
@@ -72,11 +77,21 @@ void run_app() {
 
 		sv.draw(vp, asset_manager);
 
-		helicase_shader.use();
-		helicase_shader.set_uniform("vp", vp);
-		helicase_shader.set_uniform("model", helicase_model);
-		helicase_shader.set_uniform("normal_matrix", helicase_normal);
+		obj_shader.use();
+		obj_shader.set_uniform("vp", vp);
+		obj_shader.set_uniform("normal_matrix", helicase_normal);
+
+		obj_shader.set_uniform("surface_color", glm::vec3(0.2, 0.7, 0.3));
+		obj_shader.set_uniform("model", helicase_model);
 		helicase_mesh.draw();
+
+		obj_shader.set_uniform("surface_color", glm::vec3(0.3, 0.3, 0.7));
+		obj_shader.set_uniform("model", ligase_model);
+		ligase_mesh.draw();
+
+		obj_shader.set_uniform("surface_color", glm::vec3(0.7, 0.2, 0.2));
+		obj_shader.set_uniform("model", polymerase_model);
+		polymerase_mesh.draw();
 
 		window.handle_events(event_manager);
 		window.update();
