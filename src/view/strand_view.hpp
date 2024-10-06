@@ -25,6 +25,6 @@ public:
 	strand_view(Strand&& strand, const std::vector<glm::vec4>& control_points);
 
 
-	void draw(Camera& cam, assets::AssetsManager& assets);
+	void draw(glm::mat4& vp, assets::AssetsManager& assets);
 
 };

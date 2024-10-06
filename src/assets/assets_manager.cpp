@@ -39,7 +39,12 @@ rendering::PosNormMesh& AssetsManager::get_model(const std::string& name) {
 
 	std::string path = m_base_path + "models/" + name + ".obj";
 	std::ifstream file(path);
-	std::string src = (std::stringstream() << file.rdbuf()).str();
+
+	auto r = m_meshes.insert({name, std::make_unique<rendering::PosNormMesh>()});
+	rendering::PosNormMesh& mesh = *r.first->second;
+	rendering::read_obj(file, mesh);
+
+	return mesh;
 }
 
 

@@ -102,7 +102,7 @@ in vec3 surface_normal;
 
 layout (location = 0) out vec4 frag_col;
 
-const vec3 light = vec3(0.3, 0.3, -0.7);
+const vec3 light = vec3(0.3, 0.9, 0.3);
 
 void main()
 {

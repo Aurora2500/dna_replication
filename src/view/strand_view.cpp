@@ -36,8 +36,7 @@ strand_view::strand_view(Strand&& strand, const std::vector<glm::vec4>& control_
 	m_control_point_ssbo.set_data(m_control_points.data(), m_control_points.size() * sizeof(glm::vec4));
 }
 
-void strand_view::draw(Camera& cam, assets::AssetsManager& assets) {
-	auto vp = cam.get_view_matrix();
+void strand_view::draw(glm::mat4& vp, assets::AssetsManager& assets) {
 
 	// render backbone
 	auto& backbone_shader = assets.get_shader("backbone");

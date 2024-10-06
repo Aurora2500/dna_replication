@@ -7,6 +7,6 @@
 namespace rendering {
 
 // Wavefront .OBJ file format parser
-void read_obj(const std::string& source, PosNormMesh& mesh);
+void read_obj(std::istream& source, PosNormMesh& mesh);
 
 }

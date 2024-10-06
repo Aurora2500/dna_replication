@@ -15,6 +15,7 @@
 
 #include <vector>
 #include <glm/glm.hpp>
+#include <glm/ext.hpp>
 
 #include <iostream>
 
@@ -54,13 +55,28 @@ void run_app() {
 	auto s = make_test_strand();
 
 	strand_view sv(std::move(s), cp);
+	auto& helicase_mesh = asset_manager.get_model("helicase");
+	auto& helicase_shader = asset_manager.get_shader("object_free");
+
+	glm::mat4 helicase_model(1.);
+	glm::mat3 helicase_normal(1.);
+
+	helicase_model = glm::translate(helicase_model, glm::vec3(0.0, 3., 0.f));
 
 	while (window.running()) {
 		event_manager.poll();
 		window.clear();
 		cam.handle_events(event_manager);
 
-		sv.draw(cam.cam, asset_manager);
+		auto vp = cam.cam.get_view_matrix();
+
+		sv.draw(vp, asset_manager);
+
+		helicase_shader.use();
+		helicase_shader.set_uniform("vp", vp);
+		helicase_shader.set_uniform("model", helicase_model);
+		helicase_shader.set_uniform("normal_matrix", helicase_normal);
+		helicase_mesh.draw();
 
 		window.handle_events(event_manager);
 		window.update();
