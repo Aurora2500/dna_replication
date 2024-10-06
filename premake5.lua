@@ -8,8 +8,8 @@ project "dnarepl"
 	targetdir "."
 
 	files { "src/**.hpp", "src/**.cpp" }
-	includedirs { "src" }
-	links { "SDL2", "GL", "GLEW"}
+	includedirs { "src", "/usr/include/freetype2" }
+	links { "SDL2", "GL", "GLEW", "freetype"}
 
 	filter "configurations:Debug"
 		defines { "DEBUG" }

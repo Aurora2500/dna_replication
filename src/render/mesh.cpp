@@ -7,6 +7,17 @@
 namespace rendering
 {
 
+void Vertex2D::attrib(unsigned int vao, unsigned int vbo)
+{
+	glEnableVertexArrayAttrib(vao, 0);
+	glEnableVertexArrayAttrib(vao, 1);
+	glVertexArrayAttribBinding(vao, 0, 0);
+	glVertexArrayAttribBinding(vao, 1, 0);
+	glVertexArrayAttribFormat(vao, 0, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex2D, position));
+	glVertexArrayAttribFormat(vao, 1, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex2D, tex_coords));
+	glVertexArrayVertexBuffer(vao, 0, vbo, 0, sizeof(Vertex2D));
+}
+
 void SimpleVertex::attrib(unsigned int vao, unsigned int vbo) {
 	glEnableVertexArrayAttrib(vao, 0);
 	glVertexArrayAttribBinding(vao, 0, 0);
@@ -22,6 +33,14 @@ void PosNormVertex::attrib(unsigned int vao, unsigned int vbo) {
 	glVertexArrayAttribFormat(vao, 0, 3, GL_FLOAT, GL_FALSE, offsetof(PosNormVertex, position));
 	glVertexArrayAttribFormat(vao, 1, 3, GL_FLOAT, GL_FALSE, offsetof(PosNormVertex, normal));
 	glVertexArrayVertexBuffer(vao, 0, vbo, 0, sizeof(PosNormVertex));
+}
+
+template<typename V>
+Mesh<V>::~Mesh()
+{
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
 }
 
 template <typename V>
@@ -80,5 +99,6 @@ SimpleMesh create_test_tri() {
 
 template class Mesh<SimpleVertex>;
 template class Mesh<PosNormVertex>;
+template class Mesh<Vertex2D>;
 
 }

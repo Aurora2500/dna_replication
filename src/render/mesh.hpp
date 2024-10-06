@@ -7,6 +7,14 @@
 namespace rendering
 {
 
+struct Vertex2D
+{
+	glm::vec2 position;
+	glm::vec2 tex_coords;
+
+	static void attrib(unsigned int vao, unsigned int vbo);
+};
+
 struct SimpleVertex
 {
 	glm::vec3 position;
@@ -28,6 +36,7 @@ struct Mesh
 	std::vector<V> vertices;
 	std::vector<unsigned int> indices;
 	unsigned int VAO, VBO, EBO;
+	~Mesh();
 
 	void make_buffers();
 
@@ -37,6 +46,7 @@ struct Mesh
 
 using SimpleMesh = Mesh<SimpleVertex>;
 using PosNormMesh = Mesh<PosNormVertex>;
+using Mesh2D = Mesh<Vertex2D>;
 
 SimpleMesh create_test_tri();
 }

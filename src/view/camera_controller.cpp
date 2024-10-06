@@ -7,6 +7,7 @@ constexpr double sensitivity = 0.01;
 
 CameraController::CameraController(Camera cam)
 	: cam(cam)
+	, m_mouse_down(false)
 { }
 
 void CameraController::handle_events(EventManager& events) {
