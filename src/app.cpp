@@ -9,6 +9,7 @@
 
 #include "view/camera_controller.hpp"
 #include "view/strand_view.hpp"
+#include "view/msaa.hpp"
 
 #include "windowing/window.hpp"
 #include "windowing/events.hpp"
@@ -26,7 +27,7 @@ std::vector<glm::vec4> control_points() {
 	std::vector<glm::vec4> res;
 
 	for (int i = -n; i < n; i++) {
-		res.push_back({i, 0, 0, 2*i + M_PI_2});
+		res.push_back({i, 0, 0, i});
 	}
 
 	return res;
@@ -68,32 +69,37 @@ void run_app() {
 	glm::mat4 ligase_model = glm::translate(helicase_model, glm::vec3(-2., 0., 0.));
 	glm::mat4 polymerase_model = glm::translate(helicase_model, glm::vec3(2., 0., 0.));
 
+	MSAA msaa(window.width(), window.height());
+
 	while (window.running()) {
 		event_manager.poll();
-		window.clear();
-		cam.handle_events(event_manager);
+		//window.clear();
+		{
+			MSAA_Guard msaa_guard(msaa);
+			cam.handle_events(event_manager);
 
-		auto vp = cam.cam.get_view_matrix();
+			auto vp = cam.cam.get_view_matrix();
 
-		sv.draw(vp, asset_manager);
+			sv.draw(vp, asset_manager);
 
-		obj_shader.use();
-		obj_shader.set_uniform("vp", vp);
-		obj_shader.set_uniform("normal_matrix", helicase_normal);
+			obj_shader.use();
+			obj_shader.set_uniform("vp", vp);
+			obj_shader.set_uniform("normal_matrix", helicase_normal);
 
-		obj_shader.set_uniform("surface_color", glm::vec3(0.2, 0.7, 0.3));
-		obj_shader.set_uniform("model", helicase_model);
-		helicase_mesh.draw();
+			obj_shader.set_uniform("surface_color", glm::vec3(0.2, 0.7, 0.3));
+			obj_shader.set_uniform("model", helicase_model);
+			helicase_mesh.draw();
 
-		obj_shader.set_uniform("surface_color", glm::vec3(0.3, 0.3, 0.7));
-		obj_shader.set_uniform("model", ligase_model);
-		ligase_mesh.draw();
+			obj_shader.set_uniform("surface_color", glm::vec3(0.3, 0.3, 0.7));
+			obj_shader.set_uniform("model", ligase_model);
+			ligase_mesh.draw();
 
-		obj_shader.set_uniform("surface_color", glm::vec3(0.7, 0.2, 0.2));
-		obj_shader.set_uniform("model", polymerase_model);
-		polymerase_mesh.draw();
+			obj_shader.set_uniform("surface_color", glm::vec3(0.7, 0.2, 0.2));
+			obj_shader.set_uniform("model", polymerase_model);
+			polymerase_mesh.draw();
 
-		window.handle_events(event_manager);
+			window.handle_events(event_manager);
+		}
 		window.update();
 	}
 }

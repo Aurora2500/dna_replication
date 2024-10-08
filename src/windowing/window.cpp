@@ -12,6 +12,9 @@ Window::Window(const char *title) : m_is_fullscreen(false), m_running(true), m_w
 			SDL_WINDOW_RESIZABLE |
 			SDL_WINDOW_OPENGL);
 	m_window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1600, 900, flags);
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	m_gl_context = SDL_GL_CreateContext(m_window);
 	glewExperimental = GL_TRUE;
 	auto status = glewInit();
@@ -25,6 +28,7 @@ Window::Window(const char *title) : m_is_fullscreen(false), m_running(true), m_w
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glEnable(GL_CULL_FACE);
+	glEnable(GL_MULTISAMPLE);
 	SDL_GL_SetSwapInterval(0);
 
 	std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
