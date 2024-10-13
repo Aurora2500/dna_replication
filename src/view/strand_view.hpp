@@ -3,6 +3,7 @@
 #include "assets/assets_manager.hpp"
 
 #include "model/strand.hpp"
+#include "model/proteins.hpp"
 
 #include "render/camera.hpp"
 #include "render/mesh.hpp"
@@ -12,6 +13,9 @@
 class strand_view {
 private:
 	Strand m_strand;
+
+	std::vector<Helicase> m_helicases;
+	std::vector<Polymerase> m_polymerases;
 
 	rendering::SSBO m_nucleobase_ssbo;
 	rendering::SSBO m_control_point_ssbo;
