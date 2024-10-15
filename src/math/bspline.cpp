@@ -97,3 +97,103 @@ void bspline_network::spring_correction() {
 		}
 	}
 }
+
+bspline_network_iterable bspline_network::iter(int side) {
+	return bspline_network_iterable(*this, side);
+}
+
+bspline_network_iterable::bspline_network_iterable(bspline_network& nw, int side)
+	: m_nw(nw)
+	, m_side(side)
+{}
+
+bspline_network_iterator bspline_network_iterable::begin() {
+	bspline_network_iterator it;
+	it.m_side = m_side;
+	it.m_segment_iter = m_nw.segments.begin();
+	it.m_segment_end = m_nw.segments.end();
+	auto& segment = m_nw.segments.front();
+	if (segment.index() == 0) {
+		it.m_point_iter = std::get<0>(segment).points.begin();
+	} else {
+		it.m_point_iter = (m_side == 0
+			? std::get<1>(segment).first.points.begin()
+			: std::get<1>(segment).second.points.begin()
+		);
+	}
+	return it;
+}
+
+bspline_network_iterator bspline_network_iterable::end() {
+	bspline_network_iterator it;
+	it.m_side = m_side;
+	it.m_segment_iter = m_nw.segments.end();
+	it.m_segment_end = m_nw.segments.end();
+	auto& segment = m_nw.segments.back();
+	if (segment.index() == 0) {
+		it.m_point_iter = std::get<0>(segment).points.end();
+	} else {
+		it.m_point_iter = (m_side == 0
+			? std::get<1>(segment).first.points.end()
+			: std::get<1>(segment).second.points.end()
+		);
+	}
+	return it;
+}
+
+const bspline_network_iterator::reference bspline_network_iterator::operator*() {
+	return *m_point_iter;
+}
+
+const bspline_network_iterator::pointer bspline_network_iterator::operator->() {
+	return &*m_point_iter;
+}
+
+bspline_network_iterator& bspline_network_iterator::operator++() {
+	auto& segment = *m_segment_iter;
+	auto& spline = (segment.index() == 0 ?
+		std::get<0>(segment) :
+		(
+			m_side == 0 ?
+			std::get<1>(segment).first :
+			std::get<1>(segment).second
+		)
+	);
+
+	m_point_iter++;
+	if (m_point_iter == spline.points.end()) {
+		m_segment_iter++;
+		if (m_segment_iter == m_segment_end) {
+			return *this;
+		}
+		auto& new_segment = *m_segment_iter;
+		auto& new_spline = (new_segment.index() == 0 ?
+			std::get<0>(new_segment) :
+			(
+				m_side == 0 ?
+				std::get<1>(new_segment).first :
+				std::get<1>(new_segment).second
+			)
+		);
+		m_point_iter = new_spline.points.begin();
+	}
+
+	return *this;
+}
+
+bspline_network_iterator bspline_network_iterator::operator++(int) {
+	auto temp = *this;
+	++(*this);
+	return temp;
+}
+
+bool bspline_network_iterator::operator==(bspline_network_iterator& other) {
+	if (m_side != other.m_side) return false;
+	if (m_segment_iter != other.m_segment_iter) return false;
+	if (m_point_iter != other.m_point_iter) return false;
+	return true;
+}
+
+bool bspline_network_iterator::operator!=(bspline_network_iterator& other) {
+	return !(*this == other);
+}
