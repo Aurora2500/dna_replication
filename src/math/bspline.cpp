@@ -29,8 +29,8 @@ void bspline_network::update(float dt) {
 			std::get<0>(segment).update(dt);
 		} else {
 			auto &sp = std::get<1>(segment);
-			sp.first.update(dt);
-			sp.second.update(dt);
+			sp[0].update(dt);
+			sp[1].update(dt);
 		}
 	}
 }
@@ -42,8 +42,8 @@ static void correct_pair(glm::vec4& p1, glm::vec4& p2) {
 	auto diff = p2.xyz() - p1.xyz();
 	auto actual_dist = glm::length(diff);
 	auto correction = glm::normalize(diff) * ((actual_dist - TARGET_DIST) / 2.f);
-	p1 += correction;
-	p2 -= correction;
+	p1 += glm::vec4(correction, 0.);
+	p2 -= glm::vec4(correction, 0.);
 }
 
 struct bspline_corrector {
@@ -56,8 +56,8 @@ struct bspline_corrector {
 	}
 
 	void operator()(bspline_pair& pair) {
-		(*this)(pair.first);
-		(*this)(pair.second);
+		(*this)(pair[0]);
+		(*this)(pair[1]);
 	}
 };
 
@@ -79,15 +79,15 @@ void bspline_network::spring_correction() {
 			if (left.index() == 0) {
 				auto& pr = std::get<1>(right);
 				auto& pl = std::get<0>(left).points.back();
-				auto& pr1 = pr.first.points.front();
-				auto& pr2 = pr.second.points.front();
+				auto& pr1 = pr[0].points.front();
+				auto& pr2 = pr[1].points.front();
 				correct_pair(pl, pr1);
 				correct_pair(pl, pr2);
 			} else {
 				auto &pl = std::get<1>(left);
 				auto& pr = std::get<0>(right).points.back();
-				auto& pl1 = pl.first.points.front();
-				auto& pl2 = pl.second.points.front();
+				auto& pl1 = pl[0].points.front();
+				auto& pl2 = pl[1].points.front();
 				correct_pair(pr, pl1);
 				correct_pair(pr, pl2);
 			}
@@ -116,10 +116,7 @@ bspline_network_iterator bspline_network_iterable::begin() {
 	if (segment.index() == 0) {
 		it.m_point_iter = std::get<0>(segment).points.begin();
 	} else {
-		it.m_point_iter = (m_side == 0
-			? std::get<1>(segment).first.points.begin()
-			: std::get<1>(segment).second.points.begin()
-		);
+		it.m_point_iter = std::get<1>(segment)[m_side].points.begin();
 	}
 	return it;
 }
@@ -133,10 +130,7 @@ bspline_network_iterator bspline_network_iterable::end() {
 	if (segment.index() == 0) {
 		it.m_point_iter = std::get<0>(segment).points.end();
 	} else {
-		it.m_point_iter = (m_side == 0
-			? std::get<1>(segment).first.points.end()
-			: std::get<1>(segment).second.points.end()
-		);
+		it.m_point_iter = std::get<1>(segment)[m_side].points.end();
 	}
 	return it;
 }
@@ -153,11 +147,7 @@ bspline_network_iterator& bspline_network_iterator::operator++() {
 	auto& segment = *m_segment_iter;
 	auto& spline = (segment.index() == 0 ?
 		std::get<0>(segment) :
-		(
-			m_side == 0 ?
-			std::get<1>(segment).first :
-			std::get<1>(segment).second
-		)
+		std::get<1>(segment)[m_side]
 	);
 
 	m_point_iter++;
@@ -169,11 +159,7 @@ bspline_network_iterator& bspline_network_iterator::operator++() {
 		auto& new_segment = *m_segment_iter;
 		auto& new_spline = (new_segment.index() == 0 ?
 			std::get<0>(new_segment) :
-			(
-				m_side == 0 ?
-				std::get<1>(new_segment).first :
-				std::get<1>(new_segment).second
-			)
+			std::get<1>(new_segment)[m_side]
 		);
 		m_point_iter = new_spline.points.begin();
 	}

@@ -4,12 +4,14 @@
 #include <list>
 
 template <typename T>
-using node = std::list<T>::iterator;
+using node = typename std::list<T>::iterator;
 
 template<typename T>
 struct IteratorHash {
-	std::size_t operator()(const typename std::list<T>::iterator& it) const noexcept;
+	inline std::size_t operator()(const typename std::list<T>::iterator& it) const noexcept {
+		return std::hash<T*>()(&(*it));
+	}
 };
 
 template<typename K, typename V>
-using iter_map = std::unordered_map<std::list::<K>::iterator, V, IteratorHash<K>>;
+using iter_map = std::unordered_map<typename std::list<K>::iterator, V, IteratorHash<K>>;

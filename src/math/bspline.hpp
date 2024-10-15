@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <deque>
 #include <iterator>
 #include <utility>
@@ -18,7 +19,7 @@ struct bspline {
 	void update(float dt);
 };
 
-using bspline_pair = std::pair<bspline, bspline>;
+using bspline_pair = std::array<bspline, 2>;
 
 using bspline_one_two = std::variant<bspline, bspline_pair>;
 
@@ -44,6 +45,8 @@ public:
 
 	friend class bspline_network_iterable;
 };
+
+class bspline_network;
 
 class bspline_network_iterable {
 private:
