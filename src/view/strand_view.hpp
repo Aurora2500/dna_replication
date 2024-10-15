@@ -1,6 +1,10 @@
 #pragma once
 
+#include <array>
+
 #include "assets/assets_manager.hpp"
+
+#include "math/bspline.hpp"
 
 #include "model/strand.hpp"
 #include "model/proteins.hpp"
@@ -21,9 +25,11 @@ private:
 	std::vector<Helicase> m_helicases;
 	std::vector<Polymerase> m_polymerases;
 
+	bspline_network m_spline;
+	std::array<std::vector<glm::vec4>, 2> m_ctrl_point_cache;
+	std::array<rendering::SSBO, 2> m_control_point_ssbos;
+
 	rendering::SSBO m_nucleobase_ssbo;
-	rendering::SSBO m_control_point_ssbo;
-	std::vector<glm::vec4> m_control_points;
 
 	rendering::SimpleMesh m_backbone_mesh;
 	rendering::PosNormMesh m_nucleobase_mesh;

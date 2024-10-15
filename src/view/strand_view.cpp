@@ -34,14 +34,14 @@ void strand_view::upload_nucleobases() {
 
 strand_view::strand_view(Strand&& strand, const std::vector<glm::vec4>& control_points)
 	: m_strand(strand)
-	, m_control_points(control_points)
+	, m_ctrl_point_cache({control_points})
 	, m_backbone_mesh(create_backbone_mesh(50, 16, 0.1))
 	, m_nucleobase_mesh(create_nucleobase_mesh(glm::vec3(0.08, 0.45, 0.1)))
 	, m_reverse_helicase_map()
 	, m_reverse_polymerase_map()
 {
 	upload_nucleobases();
-	m_control_point_ssbo.set_data(m_control_points.data(), m_control_points.size() * sizeof(glm::vec4));
+	m_control_point_ssbos[0].set_data(m_ctrl_point_cache[0].data(), m_ctrl_point_cache[0].size() * sizeof(glm::vec4));
 
 	auto& helicase = m_helicases.emplace_back();
 	helicase.attach(true, m_strand.create_gap(0.));
@@ -77,16 +77,16 @@ void strand_view::draw(glm::mat4& vp, assets::AssetsManager& assets) {
 
 	// render backbone
 	auto& backbone_shader = assets.get_shader("backbone");
-	m_control_point_ssbo.bind_shader(0);
+	m_control_point_ssbos[0].bind_shader(0);
 
 	backbone_shader.use();
 	backbone_shader.set_uniform("vp", vp);
 	backbone_shader.set_uniform("offset_pos", glm::vec2(0., -0.5));
 
 	backbone_shader.set_uniform("complement", 0);
-	m_backbone_mesh.draw_instanced(m_control_points.size()-3);
+	m_backbone_mesh.draw_instanced(m_ctrl_point_cache[0].size()-3);
 	backbone_shader.set_uniform("complement", 1);
-	m_backbone_mesh.draw_instanced(m_control_points.size()-3);
+	m_backbone_mesh.draw_instanced(m_ctrl_point_cache[0].size()-3);
 
 	//render nucleobases
 	m_nucleobase_ssbo.bind_shader(1);
