@@ -8,12 +8,6 @@
 constexpr float HELICASE_SPEED = 1;
 constexpr float POLYMERASE_SPEED = 1;
 
-template<typename T>
-std::size_t IteratorHash<T>::operator()(const typename std::list<T>::iterator& it) const noexcept {
-		std::hash<T*> h;
-		return h(&(*it));
-}
-
 void strand_view::upload_nucleobases() {
 	std::vector<unsigned int> packed_nucleobase_buffer;
 
@@ -120,7 +114,6 @@ void strand_view::draw(glm::mat4& vp, assets::AssetsManager& assets) {
 		auto ascending = helicase.ascending();
 		auto param = (ascending ? gap.gap_size.higher : gap.gap_size.lower);
 		obj_shader.set_uniform("param", param);
-		// std::cout << param << std::endl;
 		helicase_mesh.draw();
 	}
 }

@@ -10,17 +10,14 @@
 #include "render/shader.hpp"
 #include "render/ssbo.hpp"
 
-template<typename T>
-struct IteratorHash {
-	std::size_t operator()(const typename std::list<T>::iterator& it) const noexcept;
-};
+#include "util/iter_map.hpp"
 
 class strand_view {
 private:
 	Strand m_strand;
 
-	std::unordered_map<std::list<gap>::iterator, Helicase&, IteratorHash<gap>> m_reverse_helicase_map;
-	std::unordered_map<std::list<interval>::iterator, Polymerase&, IteratorHash<interval>> m_reverse_polymerase_map;
+	iter_map<gap, Helicase&> m_reverse_helicase_map;
+	iter_map<interval, Polymerase&> m_reverse_polymerase_map;
 	std::vector<Helicase> m_helicases;
 	std::vector<Polymerase> m_polymerases;
 

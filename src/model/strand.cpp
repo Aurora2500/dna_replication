@@ -23,5 +23,10 @@ std::list<gap>::iterator Strand::create_gap(float position) {
 		return g.gap_size.lower > position;
 	});
 
-	return m_gaps.insert(insert_pos, gap{});
+	return m_gaps.insert(insert_pos, gap{
+		.gap_size = {
+			.lower = position,
+			.higher = position,
+		}
+	});
 }
