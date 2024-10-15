@@ -14,6 +14,8 @@ enum class Direction {
 struct interval {
 	float lower;
 	float higher;
+
+	bool overlaps(interval other);
 };
 
 struct gap {
@@ -22,18 +24,16 @@ struct gap {
 	interval gap_size;
 };
 
-struct strand_gaps {
-	std::list<gap> gaps;
-};
-
 class Strand {
 private:
 	std::vector<Nucleobase> m_nucleobases;
-	strand_gaps m_gaps;
+	std::list<gap> m_gaps;
 
 public:
 	Strand(std::vector<Nucleobase>&& nucleobases);
 
 	const std::vector<Nucleobase>& nucleobases();
-	strand_gaps& gaps();
+	std::list<gap>& gaps();
+
+	std::list<gap>::iterator create_gap(float position);
 };

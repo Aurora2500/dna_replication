@@ -7,8 +7,15 @@
 class Helicase {
 private:
 	std::optional<std::list<gap>::iterator> m_attached_gap;
+	bool m_ascending;
 
 public:
+	void expand(float ammount);
+	void attach(bool ascending, std::list<gap>::iterator gap);
+	void detach();
+
+	std::optional<std::list<gap>::iterator>& attachment();
+	bool ascending();
 };
 
 class Polymerase {
