@@ -11,10 +11,12 @@
 #define GLM_SWIZZLE
 #include <glm/glm.hpp>
 
+glm::vec4 eval_bspline(float t, glm::vec4 p1, glm::vec4 p2, glm::vec4 p3, glm::vec4 p4);
+glm::vec4 eval_bspline_tangent(float t, glm::vec4 p1, glm::vec4 p2, glm::vec4 p3, glm::vec4 p4);
+
 struct bspline {
 	std::deque<glm::vec4> points;
 	std::deque<glm::vec4> speed;
-	float drag;
 
 	void update(float dt);
 };
@@ -63,6 +65,8 @@ public:
 
 struct bspline_network {
 	std::list<bspline_one_two> segments;
+
+	bspline_network(unsigned int num_points);
 
 	void update(float dt);
 	void spring_correction();

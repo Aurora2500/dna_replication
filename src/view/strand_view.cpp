@@ -26,22 +26,24 @@ void strand_view::upload_nucleobases() {
 		packed_nucleobase_buffer.push_back(packet);
 	}
 
-	m_nucleobase_ssbo.set_data(
-		packed_nucleobase_buffer.data(),
-		packed_nucleobase_buffer.size() * sizeof(unsigned int)
-	);
+	m_nucleobase_ssbo.set(packed_nucleobase_buffer);
 }
 
-strand_view::strand_view(Strand&& strand, const std::vector<glm::vec4>& control_points)
+strand_view::strand_view(Strand&& strand)
 	: m_strand(strand)
-	, m_ctrl_point_cache({control_points})
 	, m_backbone_mesh(create_backbone_mesh(50, 16, 0.1))
 	, m_nucleobase_mesh(create_nucleobase_mesh(glm::vec3(0.08, 0.45, 0.1)))
 	, m_reverse_helicase_map()
 	, m_reverse_polymerase_map()
+	// 4 nucleobases per ctrl point, ceil(x/y) = (x+y-1) / y
+	, m_num_ctrl_points( (strand.nucleobases().size() + 3) / 4 )
+	, m_spline(m_num_ctrl_points)
 {
 	upload_nucleobases();
-	m_control_point_ssbos[0].set_data(m_ctrl_point_cache[0].data(), m_ctrl_point_cache[0].size() * sizeof(glm::vec4));
+	for (int i = 0; i < 2; i++) {
+		m_ctrl_point_cache[i].reserve(m_num_ctrl_points);
+		m_control_point_ssbos[i].allocate<glm::vec4>(m_num_ctrl_points);
+	}
 
 	auto& helicase = m_helicases.emplace_back();
 	helicase.attach(true, m_strand.create_gap(0.));
@@ -71,6 +73,14 @@ void strand_view::update(float dt) {
 			gaps.erase(it--);
 		}
 	}
+
+	m_spline.update(dt);
+
+	for (int i = 0; i < 2; i++) {
+		auto spline_points = m_spline.iter(i);
+		m_ctrl_point_cache[i].assign(spline_points.begin(), spline_points.end());
+		m_control_point_ssbos[i].update(m_ctrl_point_cache[i]);
+	}
 }
 
 void strand_view::draw(glm::mat4& vp, assets::AssetsManager& assets) {
@@ -84,9 +94,9 @@ void strand_view::draw(glm::mat4& vp, assets::AssetsManager& assets) {
 	backbone_shader.set_uniform("offset_pos", glm::vec2(0., -0.5));
 
 	backbone_shader.set_uniform("complement", 0);
-	m_backbone_mesh.draw_instanced(m_ctrl_point_cache[0].size()-3);
+	m_backbone_mesh.draw_instanced(m_num_ctrl_points - 3);
 	backbone_shader.set_uniform("complement", 1);
-	m_backbone_mesh.draw_instanced(m_ctrl_point_cache[0].size()-3);
+	m_backbone_mesh.draw_instanced(m_num_ctrl_points - 3);
 
 	//render nucleobases
 	m_nucleobase_ssbo.bind_shader(1);

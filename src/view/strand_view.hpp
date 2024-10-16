@@ -25,6 +25,7 @@ private:
 	std::vector<Helicase> m_helicases;
 	std::vector<Polymerase> m_polymerases;
 
+	unsigned int m_num_ctrl_points;
 	bspline_network m_spline;
 	std::array<std::vector<glm::vec4>, 2> m_ctrl_point_cache;
 	std::array<rendering::SSBO, 2> m_control_point_ssbos;
@@ -36,7 +37,7 @@ private:
 
 	void upload_nucleobases();
 public:
-	strand_view(Strand&& strand, const std::vector<glm::vec4>& control_points);
+	strand_view(Strand&& strand);
 
 	void update(float dt);
 	void draw(glm::mat4& vp, assets::AssetsManager& assets);

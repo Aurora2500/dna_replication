@@ -4,6 +4,8 @@
 
 #include <glm/glm.hpp>
 
+const float DRAG = 0.1;
+
 // glm is in column major order, so basis matrix is defined in transposed way.
 const glm::mat4 b_spline_basis (
 	-1./6., 3./6., -3./6., 1./6.,
@@ -12,14 +14,36 @@ const glm::mat4 b_spline_basis (
 	1./6., 0./6., 0./6., 0./6.
 );
 
+glm::vec4 eval_bspline(float t, glm::vec4 p1, glm::vec4 p2, glm::vec4 p3, glm::vec4 p4) {
+	glm::vec4 T = glm::vec4(t*t*t, t*t, t, 1.);
+	glm::mat4 M = glm::transpose(glm::mat4(p1, p2, p3, p4));
+	return T * b_spline_basis * M;
+}
+
+glm::vec4 eval_bspline_tangent(float t, glm::vec4 p1, glm::vec4 p2, glm::vec4 p3, glm::vec4 p4) {
+	glm::vec4 T = glm::vec4(3*t*t, 2*t, 1., 0.);
+	glm::mat4 M = glm::transpose(glm::mat4(p1, p2, p3, p4));
+	return T * b_spline_basis * M;
+}
+
 void bspline::update(float dt) {
 	for (int i = 0; i < points.size(); i++) {
 		auto &p = points[i];
 		auto &s = speed[i];
 
 		p += s * (dt / 2);
-		s += - s * drag * dt;
+		s += - s * DRAG * dt;
 		p += s * (dt / 2);
+	}
+}
+
+bspline_network::bspline_network(unsigned int num_points)
+{
+	auto& segment = segments.emplace_back(bspline());
+	auto& spline = std::get<0>(segment);
+	for (int i = 0; i < num_points; i++) {
+		spline.points.push_back(glm::vec4(i, 0, 0, i));
+		spline.speed.push_back(glm::vec4());
 	}
 }
 
@@ -33,6 +57,8 @@ void bspline_network::update(float dt) {
 			sp[1].update(dt);
 		}
 	}
+
+	spring_correction();
 }
 
 const int CORRECTION_ITERATIONS = 6;

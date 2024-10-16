@@ -18,9 +18,19 @@ void SSBO::unbind() {
 	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
+void SSBO::allocate_bytes(unsigned int bytes) {
+	bind();
+	glBufferData(GL_SHADER_STORAGE_BUFFER, bytes, nullptr, GL_DYNAMIC_DRAW);
+}
+
 void SSBO::set_data(void *ptr, unsigned int size) {
 	bind();
 	glBufferData(GL_SHADER_STORAGE_BUFFER, size, ptr, GL_DYNAMIC_DRAW);
+}
+
+void SSBO::update_data(void *ptr, unsigned int size) {
+	bind();
+	glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, size, ptr);
 }
 
 void SSBO::bind_shader(int n) {
