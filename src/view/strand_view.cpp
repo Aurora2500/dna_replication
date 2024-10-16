@@ -80,12 +80,11 @@ void strand_view::update(float dt) {
 	}
 
 	m_spline.update(dt);
-	m_spline.debug_print_segment_lengths();
+	// m_spline.debug_print_segment_lengths();
 
 	for (int i = 0; i < 2; i++) {
 		auto spline_points = m_spline.iter(i);
 		m_ctrl_point_cache[i].assign(spline_points.begin(), spline_points.end());
-		std::cout << "ctrl points " << i << ": " << m_ctrl_point_cache[i].size() << std::endl;
 		m_control_point_ssbos[i].update(m_ctrl_point_cache[i]);
 	}
 }
@@ -94,16 +93,17 @@ void strand_view::draw(glm::mat4& vp, assets::AssetsManager& assets) {
 
 	// render backbone
 	auto& backbone_shader = assets.get_shader("backbone");
-	m_control_point_ssbos[0].bind_shader(0);
-
 	backbone_shader.use();
 	backbone_shader.set_uniform("vp", vp);
 	backbone_shader.set_uniform("offset_pos", glm::vec2(0., -0.5));
 
+	m_control_point_ssbos[0].bind_shader(0);
 	backbone_shader.set_uniform("complement", 0);
+	for (int i = 0; i < 2; i++) {
+		m_control_point_ssbos[i].bind_shader(0);
+		backbone_shader.set_uniform("complement", i);
 	m_backbone_mesh.draw_instanced(m_num_ctrl_points - 3);
-	backbone_shader.set_uniform("complement", 1);
-	m_backbone_mesh.draw_instanced(m_num_ctrl_points - 3);
+	}
 
 	//render nucleobases
 	m_nucleobase_ssbo.bind_shader(1);
@@ -113,10 +113,11 @@ void strand_view::draw(glm::mat4& vp, assets::AssetsManager& assets) {
 	nucleobase_shader.set_uniform("param_offset", glm::vec2(0.125, 0.25));
 	nucleobase_shader.set_uniform("offset_pos", glm::vec2(0., -0.5));
 
-	nucleobase_shader.set_uniform("complement", 0);
-	m_nucleobase_mesh.draw_instanced(m_strand.nucleobases().size());
-	nucleobase_shader.set_uniform("complement", 1);
-	m_nucleobase_mesh.draw_instanced(m_strand.nucleobases().size());
+	for (int i = 0; i < 2; i++) {
+		m_control_point_ssbos[i].bind_shader(0);
+		nucleobase_shader.set_uniform("complement", i);
+		m_nucleobase_mesh.draw_instanced(m_strand.nucleobases().size());
+	}
 
 	// rendering helicases
 	auto& obj_shader = assets.get_shader("object_attached");

@@ -3,6 +3,7 @@
 #include <chrono>
 #include <iostream>
 #include <vector>
+#include <thread>
 
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
@@ -17,6 +18,9 @@
 #include "view/strand_view.hpp"
 #include "windowing/window.hpp"
 #include "windowing/events.hpp"
+
+constexpr float TARGET_FPS = 80;
+constexpr std::chrono::duration<float> TARGET_DURATION (1/TARGET_FPS);
 
 Strand make_test_strand() {
 	std::vector<Nucleobase> s;
@@ -67,5 +71,10 @@ void run_app() {
 
 		window.handle_events(event_manager);
 		window.update();
+		std::cout << "fps: " << 1/dt << std::endl;
+		if (dt_duration < TARGET_DURATION) {
+			std::chrono::duration<float> left_duration = TARGET_DURATION - dt_duration;
+			std::this_thread::sleep_for(left_duration);
+		}
 	}
 }
