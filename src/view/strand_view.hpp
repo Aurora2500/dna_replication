@@ -16,6 +16,8 @@
 
 #include "util/iter_map.hpp"
 
+#include "gap_spline_bridge.hpp"
+
 class strand_view {
 private:
 	Strand m_strand;
@@ -27,6 +29,7 @@ private:
 
 	unsigned int m_num_ctrl_points;
 	bspline_network m_spline;
+	gap_spline_bridge m_bridge;
 	std::array<std::vector<glm::vec4>, 2> m_ctrl_point_cache;
 	std::array<rendering::SSBO, 2> m_control_point_ssbos;
 

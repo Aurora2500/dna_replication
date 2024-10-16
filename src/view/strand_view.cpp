@@ -35,9 +35,10 @@ strand_view::strand_view(Strand&& strand)
 	, m_nucleobase_mesh(create_nucleobase_mesh(glm::vec3(0.08, 0.45, 0.1)))
 	, m_reverse_helicase_map()
 	, m_reverse_polymerase_map()
-	// 4 nucleobases per ctrl point, ceil(x/y) = (x+y-1) / y
-	, m_num_ctrl_points( (strand.nucleobases().size() + 3) / 4 )
+	// 4 nucleobases per segment, num of ctrl points is 3 higher than num of segments, ceil(x/y) = (x+y-1) / y
+	, m_num_ctrl_points( (strand.nucleobases().size() + 3) / 4 + 3 )
 	, m_spline(m_num_ctrl_points)
+	, m_bridge(m_spline)
 {
 	upload_nucleobases();
 	for (int i = 0; i < 2; i++) {
@@ -47,12 +48,16 @@ strand_view::strand_view(Strand&& strand)
 
 	auto& helicase = m_helicases.emplace_back();
 	helicase.attach(true, m_strand.create_gap(0.));
+	auto split_it = m_spline.create_gap(0);
+	m_bridge.associate(*helicase.attachment(), split_it);
 }
 
 void strand_view::update(float dt) {
 	// expand gaps trough helicases
 	for (auto& helicase: m_helicases) {
-		helicase.expand(HELICASE_SPEED * dt);
+		if (helicase.attachment()) {
+			m_bridge.helicase_expansion(helicase, HELICASE_SPEED * dt);
+		}
 	}
 	// merge gaps
 	{
@@ -75,10 +80,12 @@ void strand_view::update(float dt) {
 	}
 
 	m_spline.update(dt);
+	m_spline.debug_print_segment_lengths();
 
 	for (int i = 0; i < 2; i++) {
 		auto spline_points = m_spline.iter(i);
 		m_ctrl_point_cache[i].assign(spline_points.begin(), spline_points.end());
+		std::cout << "ctrl points " << i << ": " << m_ctrl_point_cache[i].size() << std::endl;
 		m_control_point_ssbos[i].update(m_ctrl_point_cache[i]);
 	}
 }

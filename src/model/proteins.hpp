@@ -14,8 +14,8 @@ public:
 	void attach(bool ascending, std::list<gap>::iterator gap);
 	void detach();
 
-	std::optional<std::list<gap>::iterator>& attachment();
-	bool ascending();
+	const std::optional<std::list<gap>::iterator>& attachment() const;
+	bool ascending() const;
 };
 
 class Polymerase {

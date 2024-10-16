@@ -8,8 +8,10 @@
 #include <variant>
 #include <vector>
 
-#define GLM_SWIZZLE
+#define GLM_FORCE_SWIZZLE
 #include <glm/glm.hpp>
+
+#include "util/iter_map.hpp"
 
 glm::vec4 eval_bspline(float t, glm::vec4 p1, glm::vec4 p2, glm::vec4 p3, glm::vec4 p4);
 glm::vec4 eval_bspline_tangent(float t, glm::vec4 p1, glm::vec4 p2, glm::vec4 p3, glm::vec4 p4);
@@ -72,4 +74,10 @@ struct bspline_network {
 	void spring_correction();
 
 	bspline_network_iterable iter(int side);
+
+	void expand_gap(node<bspline_one_two> expanded, bool ascending);
+
+	node<bspline_one_two> create_gap(int pos);
+
+	void debug_print_segment_lengths();
 };

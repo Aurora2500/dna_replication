@@ -19,11 +19,11 @@ void Helicase::detach() {
 	m_attached_gap.reset();
 }
 
-std::optional<std::list<gap>::iterator>& Helicase::attachment() {
+const std::optional<std::list<gap>::iterator>& Helicase::attachment() const {
 	return m_attached_gap;
 }
 
-bool Helicase::ascending() {
+bool Helicase::ascending() const {
 	return m_ascending;
 }
 
