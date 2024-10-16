@@ -1,5 +1,6 @@
 #include "bspline.hpp"
 
+#include <cmath>
 #include <stdexcept>
 #include <iterator>
 #include <iostream>
@@ -16,6 +17,8 @@ const glm::mat4 b_spline_basis (
 	1./6., 0./6., 0./6., 0./6.
 );
 
+const glm::vec3 up(0, 1, 0);
+
 glm::vec4 eval_bspline(float t, glm::vec4 p1, glm::vec4 p2, glm::vec4 p3, glm::vec4 p4) {
 	glm::vec4 T = glm::vec4(t*t*t, t*t, t, 1.);
 	glm::mat4 M = glm::transpose(glm::mat4(p1, p2, p3, p4));
@@ -26,6 +29,14 @@ glm::vec4 eval_bspline_tangent(float t, glm::vec4 p1, glm::vec4 p2, glm::vec4 p3
 	glm::vec4 T = glm::vec4(3*t*t, 2*t, 1., 0.);
 	glm::mat4 M = glm::transpose(glm::mat4(p1, p2, p3, p4));
 	return T * b_spline_basis * M;
+}
+
+static glm::vec3 rotate_around(glm::vec3 axis, float theta) {
+	glm::vec3 tangent = glm::normalize(axis);
+	glm::vec3 binormal = glm::normalize(glm::cross(up, tangent));
+	glm::vec3 normal = glm::normalize(glm::cross(tangent, binormal));
+	theta += M_PI_2;
+	return normal * glm::cos(theta) + binormal * glm::sin(theta);
 }
 
 void bspline::update(float dt) {
@@ -43,8 +54,9 @@ bspline_network::bspline_network(unsigned int num_points)
 {
 	auto& segment = segments.emplace_back(bspline());
 	auto& spline = std::get<0>(segment);
+	int n = num_points / 2;
 	for (int i = 0; i < num_points; i++) {
-		spline.points.push_back(glm::vec4(i, 0, 0, i));
+		spline.points.push_back(glm::vec4(i - n, 0, 0, i));
 		spline.speed.push_back(glm::vec4());
 	}
 }
@@ -140,9 +152,17 @@ void bspline_network::expand_gap(node<bspline_one_two> expand, bool ascending) {
 	for (int i = 0; i < 2; i++) {
 		// if we're ascending, push it to the back, otherwise push it to the front
 		if (ascending) {
+			auto previous_point = expanded_splines[i].points.back();
+			auto forward = point.xyz() - previous_point.xyz();
+			speed += glm::vec4(rotate_around(forward, point.w + i * M_PI), 0);
 			expanded_splines[i].points.push_back(point);
+			expanded_splines[i].speed.push_back(speed);
 		} else {
+			auto previous_point = expanded_splines[i].points.front();
+			auto forward = previous_point.xyz() - point.xyz();
+			speed += glm::vec4(rotate_around(forward, point.w + i * M_PI), 0);
 			expanded_splines[i].points.push_front(point);
+			expanded_splines[i].speed.push_front(speed);
 		}
 	}
 	if (ascending) {
@@ -197,13 +217,51 @@ node<bspline_one_two> bspline_network::create_gap(int pos) {
 	auto new_split_spline_it = segments.insert(it, std::variant_alternative_t<1, bspline_one_two>());
 	auto& new_split_spline = std::get<1>(*new_split_spline_it);
 
-	for (int i = 0; i < 2; i++) {
-		new_split_spline[i].points = {spline_to_split.points.front()};
-		new_split_spline[i].speed = {spline_to_split.speed.front()};
-	}
+	auto seed_point = spline_to_split.points.front();
+
 	spline_to_split.points.pop_front();
 	spline_to_split.speed.pop_front();
 
+	
+	// calculate speed getting a from and to points, the vector is treated as the tangent.
+	std::array<glm::vec3, 2> last_points;
+	if (new_split_spline_it == segments.begin()) {
+		last_points[0] = seed_point;
+		last_points[1] = seed_point;
+	} else {
+		auto& prev = *std::prev(new_split_spline_it);
+		if (prev.index() == 0) {
+			last_points[0] = std::get<0>(prev).points.back();
+			last_points[1] = std::get<0>(prev).points.back();
+		} else {
+			last_points[0] = std::get<1>(prev)[0].points.back();
+			last_points[1] = std::get<1>(prev)[1].points.back();
+		}
+	}
+
+	std::array<glm::vec3, 2> next_points;
+	if (it == segments.end()) {
+		next_points[0] = seed_point;
+		next_points[1] = seed_point;
+	} else {
+		auto& next = *it;
+		if (next.index() == 0) {
+			next_points[0] = std::get<0>(next).points.front();
+			next_points[1] = std::get<0>(next).points.front();
+		} else {
+			next_points[0] = std::get<1>(next)[0].points.front();
+			next_points[1] = std::get<1>(next)[1].points.front();
+		}
+	}
+
+	for (int i = 0; i < 2; i++) {
+		glm::vec3 forward = next_points[i] - last_points[i];
+		float rot = seed_point.w + i * M_PI;
+		auto speed = rotate_around(forward, rot);
+		if (std::isnan(speed.x)) throw std::runtime_error("NaN produced!");
+		new_split_spline[i].points = {seed_point};
+		new_split_spline[i].speed = {glm::vec4(speed, 0)};
+	}
 	if (spline_to_split.points.size() == 0) {
 		segments.erase(it);
 	}
@@ -293,13 +351,15 @@ bspline_network_iterator bspline_network_iterator::operator++(int) {
 	return temp;
 }
 
-bool bspline_network_iterator::operator==(bspline_network_iterator& other) {
-	if (m_side != other.m_side) return false;
-	if (m_segment_iter != other.m_segment_iter) return false;
-	if (m_point_iter != other.m_point_iter) return false;
-	return true;
+bool bspline_network_iterator::operator!=(bspline_network_iterator& other) {
+	if (m_side != other.m_side) return true;
+	if (m_segment_iter == m_segment_end && other.m_segment_iter == other.m_segment_end) return false;
+	if (m_segment_iter != other.m_segment_iter) return true;
+	if (m_point_iter != other.m_point_iter) return true;
+
+	return false;
 }
 
-bool bspline_network_iterator::operator!=(bspline_network_iterator& other) {
+bool bspline_network_iterator::operator==(bspline_network_iterator& other) {
 	return !(*this == other);
 }
