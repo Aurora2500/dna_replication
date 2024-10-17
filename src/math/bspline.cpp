@@ -72,7 +72,7 @@ void bspline_network::update(float dt) {
 		}
 	}
 
-	spring_correction();
+	// spring_correction();
 }
 
 const int CORRECTION_ITERATIONS = 6;

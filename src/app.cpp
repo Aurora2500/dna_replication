@@ -71,7 +71,7 @@ void run_app() {
 
 		window.handle_events(event_manager);
 		window.update();
-		std::cout << "fps: " << 1/dt << std::endl;
+		// std::cout << "fps: " << 1/dt << std::endl;
 		if (dt_duration < TARGET_DURATION) {
 			std::chrono::duration<float> left_duration = TARGET_DURATION - dt_duration;
 			std::this_thread::sleep_for(left_duration);

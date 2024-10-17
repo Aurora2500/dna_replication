@@ -4,6 +4,8 @@
 
 #include "assets/assets_manager.hpp"
 
+#include "debug/line.hpp"
+
 #include "math/bspline.hpp"
 
 #include "model/strand.hpp"
@@ -37,6 +39,8 @@ private:
 
 	rendering::SimpleMesh m_backbone_mesh;
 	rendering::PosNormMesh m_nucleobase_mesh;
+
+	debug::line m_dbg_line;
 
 	void upload_nucleobases();
 public:

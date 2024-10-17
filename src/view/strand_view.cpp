@@ -39,6 +39,7 @@ strand_view::strand_view(Strand&& strand)
 	, m_num_ctrl_points( (strand.nucleobases().size() + 3) / 4 + 3 )
 	, m_spline(m_num_ctrl_points)
 	, m_bridge(m_spline)
+	, m_dbg_line({glm::vec4(0.), glm::vec4(0.,0.,1.,0.)})
 {
 	upload_nucleobases();
 	for (int i = 0; i < 2; i++) {
@@ -102,7 +103,16 @@ void strand_view::draw(glm::mat4& vp, assets::AssetsManager& assets) {
 	for (int i = 0; i < 2; i++) {
 		m_control_point_ssbos[i].bind_shader(0);
 		backbone_shader.set_uniform("complement", i);
-	m_backbone_mesh.draw_instanced(m_num_ctrl_points - 3);
+		m_backbone_mesh.draw_instanced(m_num_ctrl_points - 3);
+	}
+
+	auto& line_shader = assets.get_shader("line");
+	line_shader.use();
+	line_shader.set_uniform("vp", vp);
+	line_shader.set_uniform("line_col", glm::vec3(1., 0., 0.));
+	for (int i = 0; i < 2; i++) {
+		m_control_point_ssbos[i].bind_shader(0);
+		m_dbg_line.draw(m_num_ctrl_points - 1);
 	}
 
 	//render nucleobases

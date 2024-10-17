@@ -27,8 +27,6 @@ vec3 bspline_tangent(float t, vec3 p1, vec3 p2, vec3 p3, vec3 p4) {
 layout (location = 0) in vec3 pos;
 uniform mat4 vp;
 
-out float t;
-
 void main() {
 	vec3 p1 = points[gl_InstanceID + 0].xyz;
 	vec3 p2 = points[gl_InstanceID + 1].xyz;
@@ -40,7 +38,6 @@ void main() {
 	vec3 point = mix(p1, p2, pos.z);
 
 	gl_Position = vp * vec4(point, 1.);
-	t = pos.z;
 }
 
 
@@ -49,10 +46,8 @@ void main() {
 
 uniform vec3 line_col;
 
-in float t;
-
 out vec4 col;
 
 void main() {
-	col = vec4(line_col * t, 1.);
+	col = vec4(line_col, 1.);
 }
