@@ -40,7 +40,6 @@ void run_app() {
 	EventManager event_manager;
 	assets::AssetsManager asset_manager;
 	CameraController cam(window.aspect());
-	glm::mat4 ortho = glm::ortho(0, window.width(), 0, window.height());
 
 	auto s = make_test_strand();
 
@@ -56,7 +55,7 @@ void run_app() {
 
 	auto& text_shader = asset_manager.get_shader("text");
 	auto& atlas = asset_manager.get_atlas("NotoSans");
-	auto hw = atlas.create_text("Howdy, there!", 120);
+	auto hw = atlas.create_text("Howdy there, friend!", 2);
 
 	auto last_time = std::chrono::steady_clock::now();
 	while (window.running()) {
@@ -70,16 +69,18 @@ void run_app() {
 		cam.handle_events(event_manager);
 
 		auto vp = cam.cam.get_view_matrix();
+		auto ortho = glm::ortho<float>(0, window.width(), 0, window.height());
 
 		sv.update(dt);
 		sv.draw(vp, asset_manager);
 
 		glDisable(GL_DEPTH_TEST);
 		text_shader.use();
-		text_shader.set_uniform("ortho", glm::ortho(0, 1600, 0, 900));
+		text_shader.set_uniform("ortho", ortho);
 		text_shader.set_uniform("color", glm::vec3(1));
 		text_shader.set_uniform("screen_pos", glm::vec2(200));
 		atlas.texture().bind(0);
+		text_shader.set_uniform("sdf", 0);
 		hw.draw();
 		glEnable(GL_DEPTH_TEST);
 

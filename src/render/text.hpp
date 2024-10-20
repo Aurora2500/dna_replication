@@ -14,8 +14,8 @@ namespace rendering
 
 struct Glyph
 {
-	glm::uvec2 pos;
-	glm::uvec2 size;
+	glm::ivec2 pos;
+	glm::ivec2 size;
 	glm::ivec2 bearing;
 	int advance;
 };

@@ -67,7 +67,7 @@ void TextAtlas::load(FontFace& font)
 		for (unsigned int i = 0; i < bitmap.size.y; i++)
 		{
 			std::memcpy(
-				atlas_buffer.data() + (g.pos.y + bitmap.size.y - i - 1) * (m_width + 3) + g.pos.x,
+				atlas_buffer.data() + (g.pos.y + bitmap.size.y - i - 1) * m_width + g.pos.x,
 				bitmap.buffer + i * bitmap.size.x,
 				bitmap.size.x
 			);
@@ -86,7 +86,7 @@ Mesh2D TextAtlas::create_text(const std::string &text, float scale) {
 	for (auto c: text)
 	{
 		if (c == ' ') {
-			x += scale;
+			x += scale * 20;
 			continue;
 		}
 		auto g = m_glyphs[c];

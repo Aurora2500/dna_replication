@@ -34,7 +34,7 @@ FontFace TextLibrary::load_font(const std::string &path)
 		std::cerr << "Error loading font face." << std::endl;
 	}
 
-	err = FT_Set_Pixel_Sizes(face.m_face, 0, 48);
+	err = FT_Set_Pixel_Sizes(face.m_face, 0, 72);
 	if (err)
 	{
 		std::cerr << "Error setting font size." << std::endl;
@@ -48,7 +48,6 @@ FontFace::~FontFace()
 	if (!m_face)
 		return;
 	FT_Error err = FT_Done_Face(m_face);
-	std::cerr << "Deinitializing font face." << std::endl;
 	if (err)
 	{
 		std::cerr << "Error deinitializing FreeType face." << std::endl;
