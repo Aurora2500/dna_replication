@@ -43,6 +43,11 @@ private:
 	debug::line m_dbg_line;
 
 	void upload_nucleobases();
+
+	void draw_base_dna(glm::mat4& vp, assets::AssetsManager& assets);
+	void draw_helicase(glm::mat4& vp, assets::AssetsManager& assets);
+
+	void draw_debug(glm::mat4& vp, assets::AssetsManager& assets);
 public:
 	strand_view(Strand&& strand);
 

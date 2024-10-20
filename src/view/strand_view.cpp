@@ -90,9 +90,8 @@ void strand_view::update(float dt) {
 	}
 }
 
-void strand_view::draw(glm::mat4& vp, assets::AssetsManager& assets) {
-
-	// render backbone
+void strand_view::draw_base_dna(glm::mat4& vp, assets::AssetsManager& assets) {
+	// backbone
 	auto& backbone_shader = assets.get_shader("backbone");
 	backbone_shader.use();
 	backbone_shader.set_uniform("vp", vp);
@@ -106,16 +105,7 @@ void strand_view::draw(glm::mat4& vp, assets::AssetsManager& assets) {
 		m_backbone_mesh.draw_instanced(m_num_ctrl_points - 3);
 	}
 
-	auto& line_shader = assets.get_shader("line");
-	line_shader.use();
-	line_shader.set_uniform("vp", vp);
-	line_shader.set_uniform("line_col", glm::vec3(1., 0., 0.));
-	for (int i = 0; i < 2; i++) {
-		m_control_point_ssbos[i].bind_shader(0);
-		m_dbg_line.draw(m_num_ctrl_points - 1);
-	}
-
-	//render nucleobases
+	// nucleobase
 	m_nucleobase_ssbo.bind_shader(1);
 	auto& nucleobase_shader = assets.get_shader("nucleobase");
 	nucleobase_shader.use();
@@ -128,8 +118,9 @@ void strand_view::draw(glm::mat4& vp, assets::AssetsManager& assets) {
 		nucleobase_shader.set_uniform("complement", i);
 		m_nucleobase_mesh.draw_instanced(m_strand.nucleobases().size());
 	}
+}
 
-	// rendering helicases
+void strand_view::draw_helicase(glm::mat4& vp, assets::AssetsManager& assets) {
 	auto& obj_shader = assets.get_shader("object_attached");
 	auto& helicase_mesh = assets.get_model("helicase");
 	obj_shader.use();
@@ -144,4 +135,22 @@ void strand_view::draw(glm::mat4& vp, assets::AssetsManager& assets) {
 		obj_shader.set_uniform("param", param);
 		helicase_mesh.draw();
 	}
+}
+
+void strand_view::draw_debug(glm::mat4& vp, assets::AssetsManager& assets) {
+	auto& line_shader = assets.get_shader("line");
+	line_shader.use();
+	line_shader.set_uniform("vp", vp);
+	line_shader.set_uniform("line_col", glm::vec3(1., 0., 0.));
+	for (int i = 0; i < 2; i++) {
+		m_control_point_ssbos[i].bind_shader(0);
+		m_dbg_line.draw(m_num_ctrl_points - 1);
+	}
+}
+
+void strand_view::draw(glm::mat4& vp, assets::AssetsManager& assets) {
+	draw_base_dna(vp, assets);
+	draw_helicase(vp, assets);
+	draw_debug(vp, assets);
+
 }
