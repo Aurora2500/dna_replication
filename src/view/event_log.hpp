@@ -10,5 +10,9 @@ class event {
 };
 
 class event_log {
+private:
 	std::queue<event> events;
+
+public:
+	void update(float dt);
 };

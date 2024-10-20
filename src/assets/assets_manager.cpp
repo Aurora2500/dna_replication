@@ -47,5 +47,20 @@ rendering::PosNormMesh& AssetsManager::get_model(const std::string& name) {
 	return mesh;
 }
 
+rendering::TextAtlas& AssetsManager::get_atlas(const std::string& font) {
+	auto it = m_texts.find(font);
+	if (it != m_texts.end()) {
+		return *it->second;
+	}
+
+	std::string path = m_base_path + "fonts/" + font + ".ttf";
+	auto fontface = m_text.load_font(path);
+	auto r = m_texts.insert({font, std::make_unique<rendering::TextAtlas>()});
+	rendering::TextAtlas& atlas = *r.first->second;
+	atlas.load(fontface);
+
+	return atlas;
+}
+
 
 }

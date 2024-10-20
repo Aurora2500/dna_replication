@@ -16,7 +16,7 @@ struct Glyph
 {
 	glm::uvec2 pos;
 	glm::uvec2 size;
-	glm::uvec2 bearing;
+	glm::ivec2 bearing;
 	int advance;
 };
 

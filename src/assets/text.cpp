@@ -5,7 +5,7 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-Text::Text()
+TextLibrary::TextLibrary()
 {
 	FT_Error err = FT_Init_FreeType(&m_library);
 	if (err)
@@ -15,7 +15,7 @@ Text::Text()
 }
 
 
-Text::~Text()
+TextLibrary::~TextLibrary()
 {
 	FT_Error err = FT_Done_FreeType(m_library);
 	if (err)
@@ -24,7 +24,7 @@ Text::~Text()
 	}
 }
 
-FontFace Text::load_font(const std::string &path)
+FontFace TextLibrary::load_font(const std::string &path)
 {
 	FontFace face;
 	std::cerr << "Loading font face: " << path << std::endl;
@@ -69,9 +69,10 @@ FontFace::FontFace(FontFace &&other)
 	other.m_face = nullptr;
 }
 
-BitMap FontFace::load_char(char c, int flags)
+BitMap FontFace::load_char(char c)
 {
 	BitMap bitmap;
+	FT_Int32 flags = FT_LOAD_RENDER | FT_LOAD_TARGET_(FT_RENDER_MODE_SDF);
 	FT_Error err = FT_Load_Char(m_face, c, flags);
 	if (err)
 	{

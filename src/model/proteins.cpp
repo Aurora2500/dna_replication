@@ -39,6 +39,19 @@ void Polymerase::expand(float ammount) {
 	}
 }
 
-bool Polymerase::is_attached() {
-	return m_attached_fragment.has_value();
+void Polymerase::attach(Direction dir, std::list<interval>::iterator fragment) {
+	m_attached_fragment = fragment;
+	m_direction = dir;
+}
+
+void Polymerase::detach() {
+	m_attached_fragment.reset();
+}
+
+const std::optional<std::list<interval>::iterator>& Polymerase::attachment() const {
+	return m_attached_fragment;
+}
+
+Direction Polymerase::direction() {
+	return m_direction;
 }

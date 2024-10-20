@@ -9,14 +9,14 @@
 
 class FontFace;
 
-class Text
+class TextLibrary
 {
 private:
 	FT_Library m_library;
 
 public:
-	Text();
-	~Text();
+	TextLibrary();
+	~TextLibrary();
 
 	FontFace load_font(const std::string &path);
 };
@@ -41,7 +41,7 @@ public:
 	FontFace& operator=(FontFace &&other);
 	FontFace(FontFace &&other);
 
-	BitMap load_char(char c, int flags);
+	BitMap load_char(char c);
 
-	friend class Text;
+	friend class TextLibrary;
 };

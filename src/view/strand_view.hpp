@@ -44,6 +44,9 @@ private:
 
 	void upload_nucleobases();
 
+	void update_helicase_expansion(float dt);
+	void update_bspline();
+
 	void draw_base_dna(glm::mat4& vp, assets::AssetsManager& assets);
 	void draw_helicase(glm::mat4& vp, assets::AssetsManager& assets);
 

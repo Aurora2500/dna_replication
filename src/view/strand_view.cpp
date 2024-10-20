@@ -53,7 +53,7 @@ strand_view::strand_view(Strand&& strand)
 	m_bridge.associate(*helicase.attachment(), split_it);
 }
 
-void strand_view::update(float dt) {
+void strand_view::update_helicase_expansion(float dt) {
 	// expand gaps trough helicases
 	for (auto& helicase: m_helicases) {
 		if (helicase.attachment()) {
@@ -79,15 +79,21 @@ void strand_view::update(float dt) {
 			gaps.erase(it--);
 		}
 	}
+}
 
-	m_spline.update(dt);
-	// m_spline.debug_print_segment_lengths();
-
+void strand_view::update_bspline() {
 	for (int i = 0; i < 2; i++) {
 		auto spline_points = m_spline.iter(i);
 		m_ctrl_point_cache[i].assign(spline_points.begin(), spline_points.end());
 		m_control_point_ssbos[i].update(m_ctrl_point_cache[i]);
 	}
+}
+
+void strand_view::update(float dt) {
+	update_helicase_expansion(dt);
+	m_spline.update(dt);
+
+	update_bspline();
 }
 
 void strand_view::draw_base_dna(glm::mat4& vp, assets::AssetsManager& assets) {
