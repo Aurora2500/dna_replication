@@ -27,7 +27,6 @@ TextLibrary::~TextLibrary()
 FontFace TextLibrary::load_font(const std::string &path)
 {
 	FontFace face;
-	std::cerr << "Loading font face: " << path << std::endl;
 	FT_Error err = FT_New_Face(m_library, path.c_str(), 0, &face.m_face);
 	if (err)
 	{
