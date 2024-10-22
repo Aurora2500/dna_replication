@@ -18,6 +18,9 @@
 
 #include "util/iter_map.hpp"
 
+#include "windowing/events.hpp"
+
+#include "camera_controller.hpp"
 #include "gap_spline_bridge.hpp"
 
 class strand_view {
@@ -35,12 +38,16 @@ private:
 	std::array<std::vector<glm::vec4>, 2> m_ctrl_point_cache;
 	std::array<rendering::SSBO, 2> m_control_point_ssbos;
 
+	CameraController m_cam;
+
 	rendering::SSBO m_nucleobase_ssbo;
 
 	rendering::SimpleMesh m_backbone_mesh;
 	rendering::PosNormMesh m_nucleobase_mesh;
 
 	debug::line m_dbg_line;
+
+	bool m_paused;
 
 	void upload_nucleobases();
 
@@ -52,9 +59,10 @@ private:
 
 	void draw_debug(glm::mat4& vp, assets::AssetsManager& assets);
 public:
-	strand_view(Strand&& strand);
+	strand_view(Strand&& strand, float aspect);
 
+	void handle_events(EventManager& events);
 	void update(float dt);
-	void draw(glm::mat4& vp, assets::AssetsManager& assets);
+	void draw(assets::AssetsManager& assets);
 
 };

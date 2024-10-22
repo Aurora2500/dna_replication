@@ -39,11 +39,10 @@ void run_app() {
 	Window window("DNA Replication");
 	EventManager event_manager;
 	assets::AssetsManager asset_manager;
-	CameraController cam(window.aspect());
 
 	auto s = make_test_strand();
 
-	strand_view sv(std::move(s));
+	strand_view sv(std::move(s), window.aspect());
 	auto& helicase_mesh = asset_manager.get_model("helicase");
 	auto& ligase_mesh = asset_manager.get_model("ligase");
 	auto& polymerase_mesh = asset_manager.get_model("polymerase");
@@ -54,7 +53,7 @@ void run_app() {
 	glm::mat3 helicase_normal(1.);
 
 	auto& text_shader = asset_manager.get_shader("text");
-	auto& atlas = asset_manager.get_atlas("NotoSans");
+	auto& atlas = asset_manager.get_atlas("arial");
 	auto hw = atlas.create_text("Howdy there, friend!", 2);
 
 	auto last_time = std::chrono::steady_clock::now();
@@ -66,13 +65,12 @@ void run_app() {
 
 		event_manager.poll();
 		window.clear();
-		cam.handle_events(event_manager);
 
-		auto vp = cam.cam.get_view_matrix();
 		auto ortho = glm::ortho<float>(0, window.width(), 0, window.height());
 
+		sv.handle_events(event_manager);
 		sv.update(dt);
-		sv.draw(vp, asset_manager);
+		sv.draw(asset_manager);
 
 		glDisable(GL_DEPTH_TEST);
 		text_shader.use();

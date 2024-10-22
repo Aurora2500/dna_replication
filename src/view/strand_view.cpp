@@ -29,7 +29,7 @@ void strand_view::upload_nucleobases() {
 	m_nucleobase_ssbo.set(packed_nucleobase_buffer);
 }
 
-strand_view::strand_view(Strand&& strand)
+strand_view::strand_view(Strand&& strand, float aspect)
 	: m_strand(strand)
 	, m_backbone_mesh(create_backbone_mesh(50, 16, 0.1))
 	, m_nucleobase_mesh(create_nucleobase_mesh(glm::vec3(0.08, 0.45, 0.1)))
@@ -40,6 +40,8 @@ strand_view::strand_view(Strand&& strand)
 	, m_spline(m_num_ctrl_points)
 	, m_bridge(m_spline)
 	, m_dbg_line({glm::vec4(0.), glm::vec4(0.,0.,1.,0.)})
+	, m_cam(aspect)
+	, m_paused(false)
 {
 	upload_nucleobases();
 	for (int i = 0; i < 2; i++) {
@@ -87,13 +89,6 @@ void strand_view::update_bspline() {
 		m_ctrl_point_cache[i].assign(spline_points.begin(), spline_points.end());
 		m_control_point_ssbos[i].update(m_ctrl_point_cache[i]);
 	}
-}
-
-void strand_view::update(float dt) {
-	update_helicase_expansion(dt);
-	m_spline.update(dt);
-
-	update_bspline();
 }
 
 void strand_view::draw_base_dna(glm::mat4& vp, assets::AssetsManager& assets) {
@@ -154,7 +149,26 @@ void strand_view::draw_debug(glm::mat4& vp, assets::AssetsManager& assets) {
 	}
 }
 
-void strand_view::draw(glm::mat4& vp, assets::AssetsManager& assets) {
+void strand_view::handle_events(EventManager& events) {
+	m_cam.handle_events(events);
+	if (events.test_flag(EventKind::Keyboard))
+		for(auto& e: events.events()) {
+			if (e.kind == EventKind::Keyboard && e.keyboard.key == SDLK_SPACE && e.keyboard.down) {
+				m_paused = !m_paused;
+			}
+		}
+}
+
+void strand_view::update(float dt) {
+	if (m_paused) return;
+	update_helicase_expansion(dt);
+	m_spline.update(dt);
+
+	update_bspline();
+}
+
+void strand_view::draw(assets::AssetsManager& assets) {
+	auto vp = m_cam.cam.get_view_matrix();
 	draw_base_dna(vp, assets);
 	draw_helicase(vp, assets);
 	draw_debug(vp, assets);
