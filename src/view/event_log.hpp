@@ -1,6 +1,6 @@
 #pragma once
 
-#include <queue>
+#include <list>
 
 #include "render/mesh.hpp"
 #include "render/text.hpp"
@@ -8,15 +8,19 @@
 class event {
 	rendering::Mesh2D text_mesh;
 	float time_left;
+
+	friend class event_log;
 };
 
 class event_log {
 private:
-	std::queue<event> m_events;
+	std::list<event> m_events;
 	rendering::TextAtlas& m_atlas;
 	
 
 public:
-	inline event_log(rendering::TextAtlas& atlas) : m_atlas(atlas) {}
+	event_log(rendering::TextAtlas& atlas);
 	void update(float dt);
+
+	void add_event(const std::string& event);
 };

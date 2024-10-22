@@ -22,6 +22,7 @@
 
 #include "camera_controller.hpp"
 #include "gap_spline_bridge.hpp"
+#include "event_log.hpp"
 
 class strand_view {
 private:
@@ -45,6 +46,7 @@ private:
 
 	rendering::SimpleMesh m_backbone_mesh;
 	rendering::PosNormMesh m_nucleobase_mesh;
+
 
 	debug::line m_dbg_line;
 
