@@ -31,6 +31,7 @@ private:
 	iter_map<interval, Polymerase&> m_reverse_polymerase_map;
 	std::vector<Helicase> m_helicases;
 	std::vector<Polymerase> m_polymerases;
+	std::vector<Ligase> m_ligases;
 
 	unsigned int m_num_ctrl_points;
 	bspline_network m_spline;

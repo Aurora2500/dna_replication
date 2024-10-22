@@ -55,3 +55,31 @@ const std::optional<std::list<interval>::iterator>& Polymerase::attachment() con
 Direction Polymerase::direction() {
 	return m_direction;
 }
+
+bool Ligase::tick(float ammount) {
+	m_time -= ammount;
+	if (m_time > 0) {
+		return false;
+	}
+	m_time = 0;
+	return false;
+}
+
+void Ligase::attach(Direction dir, std::list<interval>::iterator fragment, float time) {
+	m_attached_fragment = fragment;
+	m_direction = dir;
+	m_time = time;
+}
+
+void Ligase::detach() {
+	m_attached_fragment.reset();
+}
+
+
+const std::optional<std::list<interval>::iterator>& Ligase::attachment() const {
+	return m_attached_fragment;
+}
+
+Direction Ligase::direction() {
+	return m_direction;
+}

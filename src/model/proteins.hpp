@@ -31,3 +31,18 @@ public:
 	const std::optional<std::list<interval>::iterator>& attachment() const;
 	Direction direction();
 };
+
+class Ligase {
+private:
+	std::optional<std::list<interval>::iterator> m_attached_fragment;
+	Direction m_direction;
+	float m_time;
+
+public:
+	bool tick(float ammount);
+	void attach(Direction dir, std::list<interval>::iterator fragment, float time);
+	void detach();
+
+	const std::optional<std::list<interval>::iterator>& attachment() const;
+	Direction direction();
+};

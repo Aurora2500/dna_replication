@@ -7,7 +7,8 @@
 
 #include <glm/glm.hpp>
 
-const float DRAG = 0.1;
+const float DRAG = 0.2;
+const float INITIAL_SPEED = 1.5;
 
 // glm is in column major order, so basis matrix is defined in transposed way.
 const glm::mat4 b_spline_basis (
@@ -35,7 +36,6 @@ static glm::vec3 rotate_around(glm::vec3 axis, float theta) {
 	glm::vec3 tangent = glm::normalize(axis);
 	glm::vec3 binormal = glm::normalize(glm::cross(up, tangent));
 	glm::vec3 normal = glm::normalize(glm::cross(tangent, binormal));
-	theta += M_PI_2;
 	return normal * glm::cos(theta) + binormal * glm::sin(theta);
 }
 
@@ -72,7 +72,7 @@ void bspline_network::update(float dt) {
 		}
 	}
 
-	// spring_correction();
+	spring_correction();
 }
 
 const int CORRECTION_ITERATIONS = 6;
@@ -148,19 +148,20 @@ void bspline_network::expand_gap(node<bspline_one_two> expand, bool ascending) {
 	auto& spline_reduced = std::get<0>(*expanding_into);
 	// if we're ascending, we're yoinking the first point, otherwise the last point
 	auto point = (ascending?spline_reduced.points.front() : spline_reduced.points.back());
-	auto speed = (ascending?spline_reduced.speed.front() : spline_reduced.speed.back());
+	auto last_speed = (ascending?spline_reduced.speed.front() : spline_reduced.speed.back());
 	for (int i = 0; i < 2; i++) {
+		auto phase = point.w + (i == 1 ? 0 : M_PI);
 		// if we're ascending, push it to the back, otherwise push it to the front
 		if (ascending) {
 			auto previous_point = expanded_splines[i].points.back();
 			auto forward = point.xyz() - previous_point.xyz();
-			speed += glm::vec4(rotate_around(forward, point.w + i * M_PI), 0);
+			auto speed = INITIAL_SPEED * glm::vec4(rotate_around(forward, phase), 0) + last_speed;
 			expanded_splines[i].points.push_back(point);
 			expanded_splines[i].speed.push_back(speed);
 		} else {
 			auto previous_point = expanded_splines[i].points.front();
 			auto forward = previous_point.xyz() - point.xyz();
-			speed += glm::vec4(rotate_around(forward, point.w + i * M_PI), 0);
+			auto speed = INITIAL_SPEED * glm::vec4(rotate_around(forward, phase), 0) + last_speed;
 			expanded_splines[i].points.push_front(point);
 			expanded_splines[i].speed.push_front(speed);
 		}
@@ -256,8 +257,8 @@ node<bspline_one_two> bspline_network::create_gap(int pos) {
 
 	for (int i = 0; i < 2; i++) {
 		glm::vec3 forward = next_points[i] - last_points[i];
-		float rot = seed_point.w + i * M_PI;
-		auto speed = rotate_around(forward, rot);
+		float rot = seed_point.w + (i == 0? 0 : M_PI);
+		auto speed = INITIAL_SPEED * rotate_around(forward, rot);
 		if (std::isnan(speed.x)) throw std::runtime_error("NaN produced!");
 		new_split_spline[i].points = {seed_point};
 		new_split_spline[i].speed = {glm::vec4(speed, 0)};
