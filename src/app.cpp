@@ -43,15 +43,6 @@ void run_app() {
 	auto s = make_test_strand();
 
 	strand_view sv(std::move(s), window.aspect());
-	auto& helicase_mesh = asset_manager.get_model("helicase");
-	auto& ligase_mesh = asset_manager.get_model("ligase");
-	auto& polymerase_mesh = asset_manager.get_model("polymerase");
-
-	auto& obj_shader = asset_manager.get_shader("object_free");
-
-	glm::mat4 helicase_model(1.);
-	glm::mat3 helicase_normal(1.);
-
 	auto last_time = std::chrono::steady_clock::now();
 	while (window.running()) {
 		auto current_time = std::chrono::steady_clock::now();
