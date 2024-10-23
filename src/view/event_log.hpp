@@ -9,6 +9,8 @@ class event {
 	rendering::Mesh2D text_mesh;
 	float time_left;
 
+	event(rendering::Mesh2D&& mesh, float time);
+
 	friend class event_log;
 };
 

@@ -36,6 +36,19 @@ void PosNormVertex::attrib(unsigned int vao, unsigned int vbo) {
 }
 
 template<typename V>
+Mesh<V>::Mesh(Mesh&& other)
+	: vertices(std::move(other.vertices))
+	, indices(std::move(other.indices))
+	, VAO(other.VAO)
+	, VBO(other.VBO)
+	, EBO(other.EBO)
+{
+	other.VAO = 0;
+	other.VBO = 0;
+	other.EBO = 0;
+}
+
+template<typename V>
 Mesh<V>::~Mesh()
 {
 	glDeleteVertexArrays(1, &VAO);

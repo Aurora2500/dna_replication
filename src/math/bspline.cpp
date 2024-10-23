@@ -7,8 +7,8 @@
 
 #include <glm/glm.hpp>
 
-const float DRAG = 0.2;
-const float INITIAL_SPEED = 1.5;
+const float DRAG = 0.1;
+const float INITIAL_SPEED = 2.5;
 
 // glm is in column major order, so basis matrix is defined in transposed way.
 const glm::mat4 b_spline_basis (

@@ -2,6 +2,11 @@
 
 constexpr float EVENT_TIME = 9;
 
+event::event(rendering::Mesh2D&& mesh, float time) 
+	: text_mesh(std::move(mesh))
+	,	time_left(time)
+{ }
+
 event_log::event_log(rendering::TextAtlas& atlas)
 	: m_atlas(atlas)
 {}
@@ -18,9 +23,7 @@ void event_log::update(float dt) {
 	}
 }
 
-void event_log::add_event(const std::string& event) {
-	m_events.emplace_front(
-		m_atlas.create_text(event, 1),
-		EVENT_TIME
-	);
+void event_log::add_event(const std::string& event_message) {
+	auto text_mesh = m_atlas.create_text(event_message, 1);
+	m_events.push_front(event(std::move(text_mesh), EVENT_TIME));
 }

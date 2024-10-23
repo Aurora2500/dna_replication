@@ -13,6 +13,9 @@ uniform mat4 vp;
 uniform vec2 offset_pos;
 uniform bool complement;
 
+uniform int id_offset;
+uniform vec2 range;
+
 const float PI = 3.1415926535897932384626;
 
 // b spline basis matrix, GLSL stores data in column major order
@@ -40,13 +43,16 @@ const vec3 up = vec3(0.0, 1.0, 0.0);
 
 void main()
 {
-	vec4 p1 = points[gl_InstanceID + 0];
-	vec4 p2 = points[gl_InstanceID + 1];
-	vec4 p3 = points[gl_InstanceID + 2];
-	vec4 p4 = points[gl_InstanceID + 3];
+	int id = gl_InstanceID + id_offset;
+	vec4 p1 = points[id + 0];
+	vec4 p2 = points[id + 1];
+	vec4 p3 = points[id + 2];
+	vec4 p4 = points[id + 3];
 
-	vec4 point = bspline(bnp.z, p1, p2, p3, p4);
-	vec3 tangent = bspline_tangent(bnp.z, p1.xyz, p2.xyz, p3.xyz, p4.xyz);
+	float parameter = mix(range.x, range.y, bnp.z);
+
+	vec4 point = bspline(parameter, p1, p2, p3, p4);
+	vec3 tangent = bspline_tangent(parameter, p1.xyz, p2.xyz, p3.xyz, p4.xyz);
 
 	vec3 unrot_binormal =  normalize(cross(up, tangent));
 

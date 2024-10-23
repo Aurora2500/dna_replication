@@ -36,6 +36,9 @@ struct Mesh
 	std::vector<V> vertices;
 	std::vector<unsigned int> indices;
 	unsigned int VAO, VBO, EBO;
+
+	Mesh() = default;
+	Mesh(Mesh&& other);
 	~Mesh();
 
 	void make_buffers();

@@ -51,14 +51,23 @@ private:
 	debug::line m_dbg_line;
 
 	bool m_paused;
+	float m_set_speed;
 
 	void upload_nucleobases();
 
 	void update_helicase_expansion(float dt);
+	void update_helicase_binding();
+	void update_polymerase_expansion(float dt);
+	void update_polymerase_binding();
+	void update_ligase_adding(float dt);
+	void update_ligase_binding();
 	void update_bspline();
 
 	void draw_base_dna(glm::mat4& vp, assets::AssetsManager& assets);
+	void draw_complement_dna(glm::mat4& vp, assets::AssetsManager& assets);
 	void draw_helicase(glm::mat4& vp, assets::AssetsManager& assets);
+	void draw_polymerase(glm::mat4& cp, assets::AssetsManager& assets);
+	void draw_ligase(glm::mat4& cp, assets::AssetsManager& assets);
 
 	void draw_debug(glm::mat4& vp, assets::AssetsManager& assets);
 public:

@@ -32,10 +32,11 @@ void Polymerase::expand(float ammount) {
 
 	switch (m_direction) {
 	case Direction::Three:
-		fragment.higher += ammount;
+		fragment.lower -= ammount;
 		break;
 	case Direction::Five:
-		fragment.lower -= ammount;
+		fragment.higher += ammount;
+		break;
 	}
 }
 

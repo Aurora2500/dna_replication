@@ -9,6 +9,8 @@ layout (std430, binding = 1) buffer Nucleobases {
 	uint nucleobases[];
 };
 
+uniform int id_offset;
+
 uniform vec2 param_offset;
 uniform mat4 vp;
 
@@ -49,7 +51,8 @@ const vec3 up = vec3(0.0, 1.0, 0.0);
 
 void main()
 {
-	float param = param_offset.y * gl_InstanceID + param_offset.x;
+	int id = gl_InstanceID + id_offset;
+	float param = param_offset.y * id + param_offset.x;
 
 	uint param_idx = uint(param);
 	float param_t = fract(param);
@@ -75,8 +78,8 @@ void main()
 
 	gl_Position = vp * vec4(transform * (pos + vec3(offset_pos, 0.)) + point.xyz, 1.0);
 	surface_normal = transform * normal;
-	uint chunk_idx = gl_InstanceID / 16;
-	uint chunk_component = gl_InstanceID % 16;
+	uint chunk_idx = id / 16;
+	uint chunk_component = id % 16;
 
 	uint chunk = nucleobases[chunk_idx];
 	chunk >>= chunk_component * 2;
