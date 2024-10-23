@@ -57,6 +57,7 @@ strand_view::strand_view(Strand&& strand, float aspect)
 	helicase.attach(true, m_strand.create_gap(0.));
 	auto split_it = m_spline.create_gap(0);
 	m_bridge.associate(*helicase.attachment(), split_it);
+	m_cam.set_focus(CamFocus(&helicase));
 }
 
 void strand_view::update_helicase_expansion(float dt) {
@@ -331,8 +332,14 @@ void strand_view::update(float dt) {
 	float warp_dt = m_set_speed * dt;
 	update_helicase_expansion(warp_dt);
 	m_spline.update(warp_dt);
+	update_helicase_binding();
+	update_polymerase_expansion(dt);
+	update_polymerase_binding();
+	update_ligase_adding(dt);
+	update_ligase_binding();
 
 	update_bspline();
+	m_cam.update_focus(m_spline);
 }
 
 void strand_view::draw(assets::AssetsManager& assets) {

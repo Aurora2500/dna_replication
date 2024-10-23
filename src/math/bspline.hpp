@@ -80,4 +80,6 @@ struct bspline_network {
 	node<bspline_one_two> create_gap(int pos);
 
 	void debug_print_segment_lengths();
+
+	glm::vec4 eval(float param, int side);
 };

@@ -5,8 +5,71 @@
 
 constexpr double sensitivity = 0.01;
 
-CameraController::CameraController(Camera cam)
-	: cam(cam)
+CamFocus::CamFocus()
+	: kind(FocusObject::StrandPos)
+	, pos({0., 0.})
+{ }
+
+CamFocus::CamFocus(Helicase* h)
+	: kind(FocusObject::Helicase)
+	, helicase(h)
+{ }
+
+CamFocus::CamFocus(Polymerase* p)
+	: kind(FocusObject::Polymerase)
+	, polymerase(p)
+{ }
+
+CamFocus::CamFocus(std::pair<float, int> p)
+	: kind(FocusObject::StrandPos)
+	, pos(p)
+{ }
+
+CamFocus& CamFocus::operator=(const CamFocus& other) {
+	kind = other.kind;
+	switch (kind) {
+	case FocusObject::StrandPos:
+		pos = other.pos;
+		break;
+	case FocusObject::Helicase:
+		helicase = other.helicase;
+		break;
+	case FocusObject::Polymerase:
+		polymerase = other.polymerase;
+		break;
+	}
+	return *this;
+}
+
+glm::vec3 CamFocus::focus(bspline_network& bspline) {
+	float param;
+	int side;
+	switch (kind) {
+	case FocusObject::StrandPos:
+		param = pos.first;
+		side = pos.second;
+		break;
+	case FocusObject::Helicase: {
+		auto accending = helicase->ascending();
+		auto itvl = (*helicase->attachment())->gap_size;
+		param = accending?itvl.higher : itvl.lower;
+		side = 0;
+	}
+		break;
+	case FocusObject::Polymerase: {
+		auto dir = polymerase->direction();
+		side = dir == Direction::Three ? 0 : 1;
+		auto itvl = **polymerase->attachment();
+		param = dir == Direction::Three? itvl.lower : itvl.higher;
+	}
+		break;
+	}
+
+	return bspline.eval(param, side);
+}
+
+CameraController::CameraController(Camera c)
+	: cam(c)
 	, m_mouse_down(false)
 { }
 
@@ -23,4 +86,12 @@ void CameraController::handle_events(EventManager& events) {
 			cam.distance() -= e.wheel.scroll;
 		}
 	}
+}
+
+void CameraController::update_focus(bspline_network& bspline) {
+	cam.focus() = m_focus.focus(bspline);
+}
+
+void CameraController::set_focus(CamFocus f) {
+	m_focus = f;
 }

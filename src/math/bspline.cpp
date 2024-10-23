@@ -277,6 +277,17 @@ void bspline_network::debug_print_segment_lengths() {
 	std::cout << std::endl;
 }
 
+glm::vec4 bspline_network::eval(float param, int side) {
+	auto it = iter(side).begin();
+	it = std::next(it, static_cast<int>(param));
+	glm::vec4 p0 = *it++;
+	glm::vec4 p1 = *it++;
+	glm::vec4 p2 = *it++;
+	glm::vec4 p3 = *it++;
+
+	return eval_bspline(param - std::floor(param), p0, p1, p2, p3);
+}
+
 bspline_network_iterable bspline_network::iter(int side) {
 	return bspline_network_iterable(*this, side);
 }
